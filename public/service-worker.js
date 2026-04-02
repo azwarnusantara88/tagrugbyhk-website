@@ -1,16 +1,23 @@
 // TAG ASIA CUP 2026 - Service Worker
 // Provides offline support and caching
 
-const CACHE_NAME = 'tag-asia-cup-v1';
+const CACHE_NAME = 'tag-asia-cup-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
+  '/icon-48x48.png',
+  '/icon-72x72.png',
+  '/icon-96x96.png',
+  '/icon-144x144.png',
   '/icon-192x192.png',
   '/icon-512x512.png',
-  '/hero_bg.jpg',
+  '/apple-touch-icon.png',
+  '/logo.png',
+  '/hero_pitch.jpg',
   '/pitch_close.jpg',
   '/pitch_midfield.jpg',
+  '/pitch_midfield_new.jpg',
   '/team_training.jpg',
   '/pitch_corner.jpg',
   '/map_sakai.jpg'
@@ -113,7 +120,7 @@ self.addEventListener('push', (event) => {
   const options = {
     body: event.data ? event.data.text() : 'New update from TAG ASIA CUP!',
     icon: '/icon-192x192.png',
-    badge: '/icon-192x192.png',
+    badge: '/icon-72x72.png',
     tag: 'tag-asia-cup-update',
     requireInteraction: false
   };
