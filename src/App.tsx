@@ -17,6 +17,7 @@ import ContactFooter from './sections/ContactFooter';
 import NewsListPage from './pages/NewsList';
 import NewsArticlePage from './pages/NewsArticle';
 import TeamProfilePage from './pages/TeamProfile';
+import InstallPWA from './components/InstallPWA';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -137,6 +138,7 @@ function App() {
   return (
     <HashRouter>
       <ScrollToTop />
+      <InstallPWA />
       <Routes>
         <Route path="/" element={<MainPage />} />
         <Route path="/news" element={<NewsListPage />} />
