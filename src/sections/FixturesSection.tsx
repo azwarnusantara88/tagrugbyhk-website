@@ -221,9 +221,9 @@ const FixturesSection = () => {
                   className="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/10 hover:bg-white/15 transition-all"
                 >
                   {/* Division Label - Colored, Centered */}
-                  <div className="text-center mb-3 sm:mb-4">
+                  <div className="text-center mb-2 sm:mb-3">
                     <span 
-                      className="inline-block px-3 py-1 sm:px-4 sm:py-1.5 text-[10px] sm:text-xs font-bold rounded-full tracking-wide"
+                      className="inline-block px-2 py-0.5 sm:px-3 sm:py-1 text-[9px] sm:text-[10px] font-bold rounded-full tracking-wide"
                       style={{ 
                         backgroundColor: divisionStyle.color,
                         color: divisionStyle.textClass.includes('white') ? 'white' : '#0B3D2E'
@@ -234,11 +234,11 @@ const FixturesSection = () => {
                   </div>
 
                   {/* Match Content - Fully Centered */}
-                  <div className="flex items-center justify-center gap-2 sm:gap-4 md:gap-6">
+                  <div className="flex items-center justify-center gap-1.5 sm:gap-3 md:gap-6">
                     
                     {/* Home Team - Full Name */}
                     <div className="flex-1 text-right min-w-0">
-                      <p className="text-white font-bold text-sm sm:text-base md:text-lg leading-tight break-words">
+                      <p className="text-white font-semibold text-[11px] sm:text-sm md:text-base leading-tight break-words">
                         {match.homeTeam}
                       </p>
                     </div>
@@ -246,21 +246,21 @@ const FixturesSection = () => {
                     {/* Home Score (if visible) */}
                     {homeScoreVisible && (
                       <div className="flex-shrink-0">
-                        <span className="text-[#CFFF2E] font-black text-2xl sm:text-3xl md:text-4xl">
+                        <span className="text-[#CFFF2E] font-black text-xl sm:text-2xl md:text-3xl">
                           {match.homeScore}
                         </span>
                       </div>
                     )}
 
                     {/* VS Badge */}
-                    <div className="flex-shrink-0 px-3 py-1.5 sm:px-4 sm:py-2 bg-white/20 rounded-full">
-                      <span className="text-white font-bold text-xs sm:text-sm tracking-wider">VS</span>
+                    <div className="flex-shrink-0 px-2 py-1 sm:px-3 sm:py-1.5 bg-white/20 rounded-full">
+                      <span className="text-white font-bold text-[10px] sm:text-xs tracking-wider">VS</span>
                     </div>
 
                     {/* Away Score (if visible) */}
                     {awayScoreVisible && (
                       <div className="flex-shrink-0">
-                        <span className="text-[#CFFF2E] font-black text-2xl sm:text-3xl md:text-4xl">
+                        <span className="text-[#CFFF2E] font-black text-xl sm:text-2xl md:text-3xl">
                           {match.awayScore}
                         </span>
                       </div>
@@ -268,24 +268,24 @@ const FixturesSection = () => {
 
                     {/* Away Team - Full Name */}
                     <div className="flex-1 text-left min-w-0">
-                      <p className="text-white font-bold text-sm sm:text-base md:text-lg leading-tight break-words">
+                      <p className="text-white font-semibold text-[11px] sm:text-sm md:text-base leading-tight break-words">
                         {match.awayTeam}
                       </p>
                     </div>
                   </div>
 
                   {/* Time & Field - Centered Below */}
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-white/10">
-                    <div className="flex items-center gap-1.5 sm:gap-2">
-                      <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#CFFF2E]" />
-                      <span className="text-white font-semibold text-sm sm:text-base">
+                  <div className="flex flex-row items-center justify-center gap-2 sm:gap-4 mt-2 sm:mt-4 pt-2 sm:pt-4 border-t border-white/10">
+                    <div className="flex items-center gap-1 sm:gap-2">
+                      <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-[#CFFF2E]" />
+                      <span className="text-white font-medium text-xs sm:text-sm">
                         {match.time}
                       </span>
                     </div>
-                    <div className="hidden sm:block w-px h-4 bg-white/30" />
-                    <div className="flex items-center gap-1.5 sm:gap-2">
-                      <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#CFFF2E]" />
-                      <span className="text-white/80 text-sm sm:text-base">
+                    <div className="w-px h-3 sm:h-4 bg-white/30" />
+                    <div className="flex items-center gap-1 sm:gap-2">
+                      <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-[#CFFF2E]" />
+                      <span className="text-white/80 text-xs sm:text-sm">
                         {match.field}
                       </span>
                     </div>
