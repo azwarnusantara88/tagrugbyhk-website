@@ -106,8 +106,8 @@ const TournamentOverview = () => {
     { icon: Calendar, label: 'Date', value: 'April 11–12, 2026' },
     { icon: MapPin, label: 'Venue', value: 'J-Green Sakai City' },
     { icon: Swords, label: 'Format', value: 'Round-robin → Knockout' },
-    { icon: Layers, label: 'Divisions', value: 'Open / Women\'s / U18 / U16' },
-  ];
+    { icon: Layers, label: 'Divisions', value: 'Mixed Open / Mens Open / Womens Open / Senior Mens' },
+
 
   return (
     <section
