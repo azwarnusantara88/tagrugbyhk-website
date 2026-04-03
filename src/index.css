@@ -1,0 +1,220 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=League+Spartan:wght@400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 160 70% 14%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 100%;
+    --card-foreground: 160 70% 14%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 160 70% 14%;
+    --primary: 73 100% 59%;
+    --primary-foreground: 160 70% 14%;
+    --secondary: 160 30% 20%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 160 30% 20%;
+    --muted-foreground: 0 0% 72%;
+    --accent: 73 100% 59%;
+    --accent-foreground: 160 70% 14%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 100% / 0.12;
+    --input: 0 0% 100% / 0.12;
+    --ring: 73 100% 59%;
+    --radius: 1.75rem;
+    
+    /* Custom HKTR Colors */
+    --hktr-green: #0B3D2E;
+    --hktr-green-light: #145A42;
+    --hktr-lime: #CFFF2E;
+    --hktr-white: #FFFFFF;
+    --hktr-offwhite: #F6F7F6;
+    --hktr-text-secondary: rgba(255,255,255,0.72);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--hktr-green);
+    color: var(--hktr-white);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'League Spartan', sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 0.92;
+  }
+}
+
+@layer components {
+  .section-pinned {
+    @apply relative w-screen overflow-hidden;
+    min-height: 100vh;
+    min-height: 100dvh; /* Dynamic viewport height for mobile */
+  }
+  
+  @media (max-width: 768px) {
+    .section-pinned {
+      min-height: auto;
+      height: auto;
+      padding-top: 60px;
+      padding-bottom: 40px;
+    }
+  }
+  
+  .section-flowing {
+    @apply relative w-full;
+  }
+  
+  .bg-pitch-overlay {
+    position: relative;
+  }
+  
+  .bg-pitch-overlay::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(11, 61, 46, 0.55);
+    z-index: 1;
+  }
+  
+  .bg-pitch-overlay > * {
+    position: relative;
+    z-index: 2;
+  }
+  
+  .card-white {
+    @apply bg-white rounded-[28px] shadow-[0_18px_60px_rgba(0,0,0,0.28)];
+  }
+  
+  @media (max-width: 768px) {
+    .card-white {
+      border-radius: 20px;
+    }
+  }
+  
+  .text-accent {
+    color: var(--hktr-lime);
+  }
+  
+  .bg-accent {
+    background-color: var(--hktr-lime);
+  }
+  
+  .btn-primary {
+    @apply px-6 py-3 md:px-8 md:py-4 bg-accent text-[#0B3D2E] font-bold rounded-full 
+           transition-all duration-300 hover:scale-105 hover:shadow-lg text-sm md:text-base;
+  }
+  
+  .btn-outline {
+    @apply px-6 py-3 md:px-8 md:py-4 border-2 border-[#CFFF2E] text-[#CFFF2E] font-bold rounded-full 
+           transition-all duration-300 hover:bg-[#CFFF2E] hover:text-[#0B3D2E] text-sm md:text-base;
+  }
+  
+  .grain-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.04;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .animation-paused {
+    animation-play-state: paused;
+  }
+  
+  /* Mobile text sizing */
+  .text-hero-title {
+    font-size: clamp(2.5rem, 10vw, 5rem);
+  }
+  
+  .text-hero-subtitle {
+    font-size: clamp(1rem, 4vw, 1.5rem);
+  }
+  
+  .text-section-title {
+    font-size: clamp(2rem, 8vw, 4rem);
+  }
+  
+  /* Mobile countdown boxes */
+  .countdown-box {
+    @apply w-12 h-14 sm:w-14 sm:h-16 md:w-20 md:h-24;
+  }
+  
+  .countdown-number {
+    font-size: clamp(1.25rem, 5vw, 2.5rem);
+  }
+}
+
+/* Mobile-specific overrides */
+@media (max-width: 768px) {
+  /* Reduce pinned section animation complexity on mobile */
+  .section-pinned {
+    scroll-snap-align: start;
+  }
+  
+  /* Smaller padding on mobile */
+  .mobile-py {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+  
+  /* Stack buttons vertically on mobile */
+  .mobile-btn-stack {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .mobile-btn-stack button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Hide scrollbar but keep functionality */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(207, 255, 46, 0.3) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(207, 255, 46, 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(207, 255, 46, 0.5);
+}
