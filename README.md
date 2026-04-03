@@ -1,93 +1,75 @@
-# HKTR Tag Asia Cup 2026 Website
+# TAG ASIA CUP 2026 🏉
 
-Official fixture website for Hong Kong Tag Rugby's first ITF-sanctioned tournament.
+Official website for the Tag Asia Cup 2026 tournament hosted by Hong Kong Tag Rugby (HKTR).
 
-## 🌐 Live Website
+**Live Site:** https://tagrugbyhk.org
 
-**URL:** https://tagrugbyhk.org
+---
 
-## 🏆 Tournament Details
+## 📅 Tournament Details
 
-- **Event:** Tag Asia Cup 2026
-- **Location:** J-Green Sakai, Osaka, Japan
-- **Dates:** April 11-12, 2026
-- **Teams:** 16
-- **Matches:** 29
-- **Divisions:** 4 (Open, Women's, U18, U16)
+| | |
+|---|---|
+| **Date** | April 11-12, 2026 |
+| **Venue** | J-Green Sakai, Osaka, Japan |
+| **Divisions** | Mixed Open / Mens Open / Womens Open / Senior Mens |
+| **Format** | Round-robin → Knockout |
 
-## 🛠 Tech Stack
+---
 
-- React + TypeScript
-- Vite
-- Tailwind CSS
-- GSAP (animations)
-- shadcn/ui components
+## 🌐 Website Features
 
-## 📁 Project Structure
+- **Live Fixtures** - 29 matches with real-time updates
+- **Live Scores** - Synced from Google Sheets
+- **Team Profiles** - 16 teams from Hong Kong, Japan, Australasia
+- **Standings** - Live league tables
+- **News & Updates** - Tournament news
+- **Travel Info** - Venue map and accommodation
+- **PWA Support** - Installable as mobile app
+- **Countdown Timer** - Days until tournament
 
-```
-├── .github/workflows/    # GitHub Actions deployment
-├── public/               # Static assets (images, logos)
-├── src/
-│   ├── sections/         # Page sections
-│   ├── components/ui/    # shadcn/ui components
-│   ├── hooks/            # Custom React hooks
-│   └── types/            # TypeScript types
-├── dist/                 # Build output (auto-generated)
-└── vite.config.ts        # Vite configuration
-```
+---
 
-## 🚀 Deployment
+## 🛠️ Tech Stack
 
-This website is automatically deployed to GitHub Pages on every push to the `main` branch.
+| Technology | Purpose |
+|------------|---------|
+| React + TypeScript | Frontend framework |
+| Vite | Build tool |
+| Tailwind CSS | Styling |
+| GSAP | Animations |
+| Google Sheets API | Live data sync |
 
-### Manual Deployment
+---
+
+## 📊 Google Sheets Integration
+
+The website syncs live data from Google Sheets:
+
+| Tab | Data |
+|-----|------|
+| FIXTURES | Match schedule, teams, times |
+| RESULTS | Live scores |
+| TEAMS | Team rosters |
+| STANDINGS | League tables |
+| NEWS | Tournament news |
+| SETTINGS | Tournament details |
+
+**Sheet ID:** `1XgS6H0S5wwhP8YfjKoazjQF_M4gs-4-5TWrp2-OD8lA`
+
+---
+
+## 🚀 Development
 
 ```bash
 # Install dependencies
 npm install
 
-# Build for production
-npm run build
-
-# The dist folder will be deployed automatically via GitHub Actions
-```
-
-## 📊 Google Sheets Integration
-
-The fixtures section can sync with Google Sheets for live updates.
-
-### Setup Instructions
-
-1. Create a Google Sheet with columns: `time`, `team1`, `team2`, `pool`, `venue`, `status`, `score`
-2. Publish the sheet to web
-3. Create a Google Apps Script web app
-4. Update the `refreshFixtures` function in `src/sections/FixturesSection.tsx`
-
-## 📝 Development
-
-```bash
-# Start development server
+# Start dev server
 npm run dev
 
 # Build for production
 npm run build
-
-# Preview production build
-npm run preview
-```
-
-## 🎨 Design System
-
-- **Primary Color:** `#0B3D2E` (Deep Pitch Green)
-- **Accent Color:** `#CFFF2E` (Neon Lime)
-- **Background:** `#F6F7F6` (Off-white)
-- **Typography:** League Spartan (headings), Inter (body)
-
-## 📧 Contact
-
-- **Email:** hktr@tagrugbyhk.org
-- **Website:** https://tagrugbyhk.org
 
 ---
 
