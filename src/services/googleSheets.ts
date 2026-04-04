@@ -1,10 +1,20 @@
 // Google Sheets Service - Client-side fetching for live data
-// Original Sheet ID: 1T3Zmy8oXY8FtkJsz6XApqr_PhVNSgC1yFAT2N_BkYDU
+// Tag Asia Cup 2026 - Live Sheet
+// UPDATED WITH YOUR SHEET ID AND GIDs
+// ============================================
 
-const SHEET_ID = '1XgS6H0S5wwhP8YfjKoazjQF_M4gs-4-5TWrp2-OD8lA';
+const SHEET_ID = '1AertW5yTqPz0Sbzx2e2ODF74CikTY_hQS9KMbQSsWkuM';
+
+// Your Tab GIDs
+const GID_FIXTURES = '0';
+const GID_TEAMS = '1275974115';
+const GID_PLAYERS = '652663105';
+const GID_NEWS = '1320981095';
+const GID_LADDERS = '397145122';
+const GID_CONFIG = '446704132';
 
 // ============================================
-// FIXTURES Interface
+// INTERFACES
 // ============================================
 export interface Fixture {
   matchId: string;
@@ -24,9 +34,6 @@ export interface Fixture {
   notes: string;
 }
 
-// ============================================
-// TEAMS Interface
-// ============================================
 export interface Team {
   teamId: string;
   teamName: string;
@@ -40,9 +47,6 @@ export interface Team {
   status: string;
 }
 
-// ============================================
-// PLAYERS Interface
-// ============================================
 export interface Player {
   playerId: string;
   teamId: string;
@@ -63,9 +67,6 @@ export interface Player {
   status: string;
 }
 
-// ============================================
-// NEWS Interface
-// ============================================
 export interface NewsArticle {
   articleId: string;
   title: string;
@@ -80,9 +81,6 @@ export interface NewsArticle {
   slug: string;
 }
 
-// ============================================
-// STANDINGS Interface
-// ============================================
 export interface Standing {
   position: number;
   teamId: string;
@@ -101,9 +99,6 @@ export interface Standing {
   form: string;
 }
 
-// ============================================
-// CONFIG Interface
-// ============================================
 export interface Config {
   informationPackUrl: string;
   tournamentName: string;
@@ -112,10 +107,9 @@ export interface Config {
 }
 
 // ============================================
-// FALLBACK DATA (used if Google Sheets fails)
+// FALLBACK DATA
 // ============================================
 const fallbackFixtures: Fixture[] = [
-  // Saturday Matches
   { matchId: 'M001', date: '2026-04-11', day: 'Saturday', time: '12:30', field: 'Field 1', homeTeamId: 'HK_MXO1', homeTeam: "Hong Kong Mixed Open's 1", awayTeamId: 'JPN_MXO2', awayTeam: "Japan Mixed Open's 2", division: 'Mixed Open', round: 'Group A', status: 'Scheduled', homeScore: 0, awayScore: 0, notes: 'Opening match' },
   { matchId: 'M002', date: '2026-04-11', day: 'Saturday', time: '12:30', field: 'Field 2', homeTeamId: 'JPN_MXO1', homeTeam: "Japan Mixed Open's 1", awayTeamId: 'HK_MXO2', awayTeam: "Hong Kong Mixed Open's 2", division: 'Mixed Open', round: 'Group A', status: 'Scheduled', homeScore: 0, awayScore: 0, notes: '' },
   { matchId: 'M003', date: '2026-04-11', day: 'Saturday', time: '13:07', field: 'Field 1', homeTeamId: 'JPN_SNR1', homeTeam: 'Japan Senior 1', awayTeamId: 'HK_SNR', awayTeam: "Hong Kong Senior Men's", division: 'Senior Mens', round: 'Group B', status: 'Scheduled', homeScore: 0, awayScore: 0, notes: '' },
@@ -126,7 +120,6 @@ const fallbackFixtures: Fixture[] = [
   { matchId: 'M008', date: '2026-04-11', day: 'Saturday', time: '15:18', field: 'Field 1', homeTeamId: 'JPN_MO_WEST', homeTeam: "Japan Men's West", awayTeamId: 'ASIA_MO', awayTeam: "Australasia Men's Open", division: 'Mens Open', round: 'Group C', status: 'Scheduled', homeScore: 0, awayScore: 0, notes: '' },
   { matchId: 'M009', date: '2026-04-11', day: 'Saturday', time: '15:50', field: 'Field 1', homeTeamId: 'HK_MXO1', homeTeam: "Hong Kong Mixed Open's 1", awayTeamId: 'JPN_MXO2', awayTeam: "Japan Mixed Open's 2", division: 'Mixed Open', round: 'Group A', status: 'Scheduled', homeScore: 0, awayScore: 0, notes: '' },
   { matchId: 'M010', date: '2026-04-11', day: 'Saturday', time: '15:50', field: 'Field 2', homeTeamId: 'JPN_MXO1', homeTeam: "Japan Mixed Open's 1", awayTeamId: 'HK_MXO2', awayTeam: "Hong Kong Mixed Open's 2", division: 'Mixed Open', round: 'Group A', status: 'Scheduled', homeScore: 0, awayScore: 0, notes: '' },
-  // Sunday Matches
   { matchId: 'M011', date: '2026-04-12', day: 'Sunday', time: '08:00', field: 'Field 1', homeTeamId: 'ASIA_MXO', homeTeam: "Australasia Mixed's Open", awayTeamId: 'HK_MXO2', awayTeam: "Hong Kong Mixed Open's 2", division: 'Mixed Open', round: 'Group A', status: 'Scheduled', homeScore: 0, awayScore: 0, notes: '' },
   { matchId: 'M012', date: '2026-04-12', day: 'Sunday', time: '08:00', field: 'Field 2', homeTeamId: 'JPN_MO_EAST', homeTeam: "Japan Men's East", awayTeamId: 'HK_MO1', awayTeam: "Hong Kong Men's Opens 1", division: 'Mens Open', round: 'Group C', status: 'Scheduled', homeScore: 0, awayScore: 0, notes: '' },
   { matchId: 'M013', date: '2026-04-12', day: 'Sunday', time: '08:37', field: 'Field 1', homeTeamId: 'JPN_SNR1', homeTeam: 'Japan Senior 1', awayTeamId: 'JPN_SNR2', awayTeam: 'Japan Senior 2', division: 'Senior Mens', round: 'Group B', status: 'Scheduled', homeScore: 0, awayScore: 0, notes: '' },
@@ -153,14 +146,14 @@ const fallbackTeams: Team[] = [
   { teamId: 'HK_MXO2', teamName: "Hong Kong Mixed Open's 2", logoUrl: '', division: 'Mixed Open', category: 'Open', captain: 'TBD', coach: 'TBD', bio: '', active: true, status: 'Active' },
   { teamId: 'HK_MO1', teamName: "Hong Kong Men's Opens 1", logoUrl: '', division: 'Mens Open', category: 'Open', captain: 'TBD', coach: 'TBD', bio: '', active: true, status: 'Active' },
   { teamId: 'HK_MO2', teamName: "Hong Kong Men's Opens 2", logoUrl: '', division: 'Mens Open', category: 'Open', captain: 'TBD', coach: 'TBD', bio: '', active: true, status: 'Active' },
-  { teamId: 'HK_SNR', teamName: "Hong Kong Senior Men's", logoUrl: '', division: 'Senior Mens', category: '30-60', captain: 'TBD', coach: 'TBD', bio: '', active: true, status: 'Active' },
+  { teamId: 'HK_SNR', teamName: "Hong Kong Senior Men's", logoUrl: '', division: 'Senior Mens', category: '35+', captain: 'TBD', coach: 'TBD', bio: '', active: true, status: 'Active' },
   { teamId: 'JPN_MXO1', teamName: "Japan Mixed Open's 1", logoUrl: '', division: 'Mixed Open', category: 'Open', captain: 'TBD', coach: 'TBD', bio: '', active: true, status: 'Active' },
   { teamId: 'JPN_MXO2', teamName: "Japan Mixed Open's 2", logoUrl: '', division: 'Mixed Open', category: 'Open', captain: 'TBD', coach: 'TBD', bio: '', active: true, status: 'Active' },
   { teamId: 'JPN_MO_EAST', teamName: "Japan Men's East", logoUrl: '', division: 'Mens Open', category: 'Open', captain: 'TBD', coach: 'TBD', bio: '', active: true, status: 'Active' },
   { teamId: 'JPN_MO_WEST', teamName: "Japan Men's West", logoUrl: '', division: 'Mens Open', category: 'Open', captain: 'TBD', coach: 'TBD', bio: '', active: true, status: 'Active' },
   { teamId: 'JPN_SNR1', teamName: 'Japan Senior 1', logoUrl: '', division: 'Senior Mens', category: 'Open', captain: 'TBD', coach: 'TBD', bio: '', active: true, status: 'Active' },
   { teamId: 'JPN_SNR2', teamName: 'Japan Senior 2', logoUrl: '', division: 'Senior Mens', category: 'Open', captain: 'TBD', coach: 'TBD', bio: '', active: true, status: 'Active' },
-  { teamId: 'JPN_SNR3', teamName: 'Japan Senior 3', logoUrl: '', division: 'Senior Mens', category: '30-60', captain: 'TBD', coach: 'TBD', bio: '', active: true, status: 'Active' },
+  { teamId: 'JPN_SNR3', teamName: 'Japan Senior 3', logoUrl: '', division: 'Senior Mens', category: '40+', captain: 'TBD', coach: 'TBD', bio: '', active: true, status: 'Active' },
   { teamId: 'JPN_WO', teamName: 'Japan Women', logoUrl: '', division: 'Womens Open', category: 'Open', captain: 'TBD', coach: 'TBD', bio: '', active: true, status: 'Active' },
   { teamId: 'ASIA_MXO', teamName: "Australasia Mixed's Open", logoUrl: '', division: 'Mixed Open', category: 'Open', captain: 'TBD', coach: 'TBD', bio: '', active: true, status: 'Active' },
   { teamId: 'ASIA_MO', teamName: "Australasia Men's Open", logoUrl: '', division: 'Mens Open', category: 'Open', captain: 'TBD', coach: 'TBD', bio: '', active: true, status: 'Active' },
@@ -168,11 +161,8 @@ const fallbackTeams: Team[] = [
 ];
 
 // ============================================
-// CLIENT-SIDE Google Sheets Fetch
-// This runs in the browser and CAN access Google Sheets
+// CSV PARSING
 // ============================================
-
-// Parse CSV data from Google Sheets
 const parseCSV = (csvText: string): string[][] => {
   const rows: string[][] = [];
   const lines = csvText.split('\n');
@@ -203,7 +193,9 @@ const parseCSV = (csvText: string): string[][] => {
   return rows;
 };
 
-// Fetch sheet data from browser (client-side)
+// ============================================
+// FETCH FROM GOOGLE SHEETS
+// ============================================
 const fetchSheetFromBrowser = async (gid: string): Promise<string[][]> => {
   const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/pub?gid=${gid}&single=true&output=csv`;
   
@@ -217,56 +209,21 @@ const fetchSheetFromBrowser = async (gid: string): Promise<string[][]> => {
 };
 
 // ============================================
-// FETCH FIXTURES (with live score sync)
+// FETCH FIXTURES
 // ============================================
 export const fetchFixtures = async (): Promise<Fixture[]> => {
   try {
-    // Try to fetch from Google Sheets (client-side)
-    // FIXTURES tab gid = 1885819712
-    // RESULTS tab gid = 1885819712 (same sheet, different range)
+    const rows = await fetchSheetFromBrowser(GID_FIXTURES);
     
-    const [fixtureRows, resultRows] = await Promise.all([
-      fetchSheetFromBrowser('1885819712'),
-      fetchSheetFromBrowser('1885819712') // Same sheet for now
-    ]);
+    console.log('Fetched fixtures from Google Sheets:', rows.length, 'rows');
     
-    console.log('Fetched fixtures from Google Sheets:', fixtureRows.length, 'rows');
-    
-    // Parse RESULTS for scores
-    const scores = new Map<string, { homeScore: number; awayScore: number }>();
-    
-    // Find RESULTS data (usually in a different section or tab)
-    // For now, we'll check if there's a RESULTS section in the same sheet
-    let inResultsSection = false;
-    
-    for (const row of resultRows) {
-      const matchId = row[0]?.trim();
-      
-      // Check if this is the RESULTS header
-      if (matchId === 'MatchID' && row[1]?.includes('HomeTeam')) {
-        inResultsSection = true;
-        continue;
-      }
-      
-      if (inResultsSection && matchId && matchId.startsWith('M')) {
-        const homeScore = row[2] ? Number(row[2]) : 0;
-        const awayScore = row[5] ? Number(row[5]) : 0;
-        scores.set(matchId, {
-          homeScore: isNaN(homeScore) ? 0 : homeScore,
-          awayScore: isNaN(awayScore) ? 0 : awayScore
-        });
-      }
-    }
-    
-    // Parse FIXTURES
     const fixtures: Fixture[] = [];
     let dataStarted = false;
     
-    for (let i = 0; i < fixtureRows.length; i++) {
-      const row = fixtureRows[i];
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
       const matchId = row[0]?.trim();
       
-      // Skip headers until we find M001
       if (!dataStarted) {
         if (matchId && matchId === 'M001') {
           dataStarted = true;
@@ -276,8 +233,6 @@ export const fetchFixtures = async (): Promise<Fixture[]> => {
       }
       
       if (!matchId || !matchId.startsWith('M')) continue;
-      
-      const scoreData = scores.get(matchId) || { homeScore: 0, awayScore: 0 };
       
       fixtures.push({
         matchId: matchId,
@@ -292,9 +247,9 @@ export const fetchFixtures = async (): Promise<Fixture[]> => {
         division: row[11] || '',
         round: row[12] || '',
         status: row[13] || '',
-        homeScore: scoreData.homeScore,
-        awayScore: scoreData.awayScore,
-        notes: row[15] || '',
+        homeScore: parseInt(row[7]) || 0,
+        awayScore: parseInt(row[10]) || 0,
+        notes: row[14] || '',
       });
     }
     
@@ -316,8 +271,7 @@ export const fetchFixtures = async (): Promise<Fixture[]> => {
 // ============================================
 export const fetchTeams = async (): Promise<Team[]> => {
   try {
-    // TEAMS tab gid = 114025676
-    const rows = await fetchSheetFromBrowser('114025676');
+    const rows = await fetchSheetFromBrowser(GID_TEAMS);
     
     console.log('Fetched teams from Google Sheets:', rows.length, 'rows');
     
@@ -327,7 +281,6 @@ export const fetchTeams = async (): Promise<Team[]> => {
     for (const row of rows) {
       const teamId = row[0]?.trim();
       
-      // Skip until we find first TeamID
       if (!dataStarted) {
         if (teamId && (teamId.startsWith('HK') || teamId.startsWith('JPN') || teamId.startsWith('ASIA'))) {
           dataStarted = true;
@@ -338,7 +291,7 @@ export const fetchTeams = async (): Promise<Team[]> => {
       
       if (!teamId) continue;
       
-      const status = row[16]?.trim() || 'Active';
+      const status = row[12]?.trim() || 'Active';
       
       teams.push({
         teamId: teamId,
@@ -348,8 +301,8 @@ export const fetchTeams = async (): Promise<Team[]> => {
         category: row[5] || '',
         captain: row[6] || '',
         coach: row[8] || '',
-        bio: '',
-        active: status === 'Active',
+        bio: row[10] || '',
+        active: row[11] === 'TRUE',
         status: status,
       });
     }
@@ -376,16 +329,99 @@ export const fetchTeamById = async (teamId: string): Promise<Team | null> => {
 // FETCH PLAYERS
 // ============================================
 export const fetchPlayers = async (_teamId?: string): Promise<Player[]> => {
-  // Placeholder - implement when needed
-  return [];
+  try {
+    const rows = await fetchSheetFromBrowser(GID_PLAYERS);
+    
+    const players: Player[] = [];
+    let dataStarted = false;
+    
+    for (const row of rows) {
+      const playerId = row[0]?.trim();
+      
+      if (!dataStarted) {
+        if (playerId && playerId.startsWith('P')) {
+          dataStarted = true;
+        } else {
+          continue;
+        }
+      }
+      
+      if (!playerId) continue;
+      
+      players.push({
+        playerId: playerId,
+        teamId: row[1] || '',
+        name: row[2] || '',
+        nickname: row[3] || '',
+        number: parseInt(row[4]) || 0,
+        position: row[5] || '',
+        photoUrl: row[6] || '',
+        caps: parseInt(row[7]) || 0,
+        fullName: row[2] || '',
+        preferredName: row[3] || row[2] || '',
+        teamCode: row[1] || '',
+        teamName: '',
+        division: '',
+        jersey: row[4] || '',
+        nationality: row[11] || '',
+        bio: row[12] || '',
+        status: row[13] || 'Active',
+      });
+    }
+    
+    return players;
+    
+  } catch (err) {
+    console.warn('Failed to fetch players:', err);
+    return [];
+  }
 };
 
 // ============================================
 // FETCH NEWS
 // ============================================
 export const fetchNews = async (): Promise<NewsArticle[]> => {
-  // Placeholder - implement when needed
-  return [];
+  try {
+    const rows = await fetchSheetFromBrowser(GID_NEWS);
+    
+    const articles: NewsArticle[] = [];
+    let dataStarted = false;
+    
+    for (const row of rows) {
+      const articleId = row[0]?.trim();
+      
+      if (!dataStarted) {
+        if (articleId && articleId.startsWith('N')) {
+          dataStarted = true;
+        } else {
+          continue;
+        }
+      }
+      
+      if (!articleId) continue;
+      if (row[9] !== 'TRUE') continue;
+      
+      articles.push({
+        articleId: articleId,
+        title: row[1] || '',
+        author: row[2] || '',
+        date: row[3] || '',
+        category: row[4] || '',
+        excerpt: row[5] || '',
+        content: row[6] || '',
+        featuredImage: row[7] || '',
+        galleryImages: row[8] ? row[8].split(',') : [],
+        published: true,
+        slug: row[10] || '',
+      });
+    }
+    
+    return articles;
+    
+  } catch (err) {
+    console.warn('Failed to fetch news:', err);
+    return [];
+  }
 };
 
 export const fetchNewsBySlug = async (slug: string): Promise<NewsArticle | null> => {
@@ -397,8 +433,50 @@ export const fetchNewsBySlug = async (slug: string): Promise<NewsArticle | null>
 // FETCH STANDINGS
 // ============================================
 export const fetchStandings = async (_division?: string): Promise<Standing[]> => {
-  // Placeholder - implement when needed
-  return [];
+  try {
+    const rows = await fetchSheetFromBrowser(GID_LADDERS);
+    
+    const standings: Standing[] = [];
+    let dataStarted = false;
+    
+    for (const row of rows) {
+      const position = parseInt(row[0]);
+      
+      if (!dataStarted) {
+        if (!isNaN(position) && position > 0) {
+          dataStarted = true;
+        } else {
+          continue;
+        }
+      }
+      
+      if (isNaN(position)) continue;
+      
+      standings.push({
+        position: position,
+        teamId: row[1] || '',
+        teamName: row[2] || '',
+        division: row[3] || '',
+        played: parseInt(row[4]) || 0,
+        won: parseInt(row[5]) || 0,
+        drawn: parseInt(row[6]) || 0,
+        lost: parseInt(row[7]) || 0,
+        pointsFor: parseInt(row[8]) || 0,
+        pointsAgainst: parseInt(row[9]) || 0,
+        pointsDiff: parseInt(row[10]) || 0,
+        bonusPoints: parseInt(row[11]) || 0,
+        totalPoints: parseInt(row[12]) || 0,
+        winPercent: parseFloat(row[13]) || 0,
+        form: row[14] || '',
+      });
+    }
+    
+    return standings;
+    
+  } catch (err) {
+    console.warn('Failed to fetch standings:', err);
+    return [];
+  }
 };
 
 // ============================================
@@ -406,8 +484,7 @@ export const fetchStandings = async (_division?: string): Promise<Standing[]> =>
 // ============================================
 export const fetchConfig = async (): Promise<Config> => {
   try {
-    // Try to fetch from SETTINGS tab (gid 0 is usually the first sheet)
-    const rows = await fetchSheetFromBrowser('0');
+    const rows = await fetchSheetFromBrowser(GID_CONFIG);
     
     const config: Config = {
       informationPackUrl: '',
@@ -416,36 +493,28 @@ export const fetchConfig = async (): Promise<Config> => {
       venue: 'J-Green Sakai, Osaka',
     };
     
-    // Parse SETTINGS data if available
-    let inSettingsSection = false;
     for (const row of rows) {
       const key = row[0]?.trim();
       const value = row[1]?.trim();
       
-      if (key === 'Key' && value === 'Value') {
-        inSettingsSection = true;
-        continue;
-      }
-      
-      if (inSettingsSection && key && value) {
-        switch (key) {
-          case 'TournamentName':
-            config.tournamentName = value;
-            break;
-          case 'EventDate':
-            config.tournamentDates = value;
-            break;
-          case 'Location':
-            config.venue = value;
-            break;
-          case 'WebsiteURL':
-            config.informationPackUrl = value;
-            break;
-        }
+      switch (key) {
+        case 'TournamentName':
+          config.tournamentName = value;
+          break;
+        case 'EventDate':
+          config.tournamentDates = value;
+          break;
+        case 'Location':
+          config.venue = value;
+          break;
+        case 'InformationPack':
+          config.informationPackUrl = value;
+          break;
       }
     }
     
     return config;
+    
   } catch (err) {
     console.warn('Failed to fetch config, using defaults:', err);
     return {
@@ -479,7 +548,6 @@ export const getDivisionStyle = (divisionName: string): DivisionStyle => {
   return divisionColors[normalized] || divisionColors['TBD'];
 };
 
-// Helper functions
 export const getAbbreviatedDivision = (division: string): string => {
   const d = division?.toLowerCase() || '';
   if (d.includes('senior') && d.includes('men')) return 'SENIOR MENS';
