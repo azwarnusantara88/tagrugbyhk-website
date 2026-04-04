@@ -1,5 +1,10 @@
+// Google Sheets Service - Client-side fetching for live data
+// Tag Asia Cup 2026 - Live Sheet
+// YOUR SHEET ID AND GIDs
+
 const SHEET_ID = '1AertW5yTqPz0Sbzx2e2ODF74CikTY_hQS9KMbQSsWkuM';
 
+// Your Tab GIDs
 const GID_FIXTURES = '0';
 const GID_TEAMS = '1275974115';
 const GID_PLAYERS = '652663105';
@@ -7,6 +12,9 @@ const GID_NEWS = '1320981095';
 const GID_LADDERS = '397145122';
 const GID_CONFIG = '446704132';
 
+// ============================================
+// INTERFACES
+// ============================================
 export interface Fixture {
   matchId: string;
   date: string;
@@ -97,6 +105,9 @@ export interface Config {
   venue: string;
 }
 
+// ============================================
+// FALLBACK DATA
+// ============================================
 const fallbackFixtures: Fixture[] = [
   { matchId: 'M001', date: '2026-04-11', day: 'Saturday', time: '12:30', field: 'Field 1', homeTeamId: 'HK_MXO1', homeTeam: "Hong Kong Mixed Open's 1", awayTeamId: 'JPN_MXO2', awayTeam: "Japan Mixed Open's 2", division: 'Mixed Open', round: 'Group A', status: 'Scheduled', homeScore: 0, awayScore: 0, notes: 'Opening match' },
   { matchId: 'M002', date: '2026-04-11', day: 'Saturday', time: '12:30', field: 'Field 2', homeTeamId: 'JPN_MXO1', homeTeam: "Japan Mixed Open's 1", awayTeamId: 'HK_MXO2', awayTeam: "Hong Kong Mixed Open's 2", division: 'Mixed Open', round: 'Group A', status: 'Scheduled', homeScore: 0, awayScore: 0, notes: '' },
@@ -148,6 +159,9 @@ const fallbackTeams: Team[] = [
   { teamId: 'ASIA_WO', teamName: 'Australasia Women', logoUrl: '', division: 'Womens Open', category: 'Open', captain: 'TBD', coach: 'TBD', bio: '', active: true, status: 'Active' },
 ];
 
+// ============================================
+// CSV PARSING
+// ============================================
 const parseCSV = (csvText: string): string[][] => {
   const rows: string[][] = [];
   const lines = csvText.split('\n');
@@ -178,6 +192,9 @@ const parseCSV = (csvText: string): string[][] => {
   return rows;
 };
 
+// ============================================
+// FETCH FROM GOOGLE SHEETS
+// ============================================
 const fetchSheetFromBrowser = async (gid: string): Promise<string[][]> => {
   const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/pub?gid=${gid}&single=true&output=csv`;
   
@@ -190,6 +207,9 @@ const fetchSheetFromBrowser = async (gid: string): Promise<string[][]> => {
   return parseCSV(csvText);
 };
 
+// ============================================
+// FETCH FIXTURES
+// ============================================
 export const fetchFixtures = async (): Promise<Fixture[]> => {
   try {
     const rows = await fetchSheetFromBrowser(GID_FIXTURES);
@@ -245,6 +265,9 @@ export const fetchFixtures = async (): Promise<Fixture[]> => {
   }
 };
 
+// ============================================
+// FETCH TEAMS
+// ============================================
 export const fetchTeams = async (): Promise<Team[]> => {
   try {
     const rows = await fetchSheetFromBrowser(GID_TEAMS);
@@ -301,6 +324,9 @@ export const fetchTeamById = async (teamId: string): Promise<Team | null> => {
   return teams.find(t => t.teamId === teamId) || null;
 };
 
+// ============================================
+// FETCH PLAYERS
+// ============================================
 export const fetchPlayers = async (_teamId?: string): Promise<Player[]> => {
   try {
     const rows = await fetchSheetFromBrowser(GID_PLAYERS);
@@ -350,6 +376,9 @@ export const fetchPlayers = async (_teamId?: string): Promise<Player[]> => {
   }
 };
 
+// ============================================
+// FETCH NEWS
+// ============================================
 export const fetchNews = async (): Promise<NewsArticle[]> => {
   try {
     const rows = await fetchSheetFromBrowser(GID_NEWS);
@@ -399,6 +428,9 @@ export const fetchNewsBySlug = async (slug: string): Promise<NewsArticle | null>
   return articles.find(a => a.slug === slug) || null;
 };
 
+// ============================================
+// FETCH STANDINGS
+// ============================================
 export const fetchStandings = async (_division?: string): Promise<Standing[]> => {
   try {
     const rows = await fetchSheetFromBrowser(GID_LADDERS);
@@ -446,6 +478,9 @@ export const fetchStandings = async (_division?: string): Promise<Standing[]> =>
   }
 };
 
+// ============================================
+// FETCH CONFIG
+// ============================================
 export const fetchConfig = async (): Promise<Config> => {
   try {
     const rows = await fetchSheetFromBrowser(GID_CONFIG);
@@ -490,6 +525,9 @@ export const fetchConfig = async (): Promise<Config> => {
   }
 };
 
+// ============================================
+// DIVISION COLORS
+// ============================================
 export interface DivisionStyle {
   bgClass: string;
   textClass: string;
