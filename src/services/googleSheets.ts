@@ -1,7 +1,7 @@
 // Google Sheets Service - Client-side fetching for live data
 // Original Sheet ID: 1T3Zmy8oXY8FtkJsz6XApqr_PhVNSgC1yFAT2N_BkYDU
 
-const SHEET_ID = '1T3Zmy8oXY8FtkJsz6XApqr_PhVNSgC1yFAT2N_BkYDU';
+const SHEET_ID = '1XgS6H0S5wwhP8YfjKoazjQF_M4gs-4-5TWrp2-OD8lA';
 
 // ============================================
 // FIXTURES Interface
