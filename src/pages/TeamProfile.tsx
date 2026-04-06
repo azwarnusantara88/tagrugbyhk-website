@@ -1,7 +1,18 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, Users, Crown, Medal } from 'lucide-react';
-import { fetchTeamById, fetchPlayers, fetchFixtures, getDivisionStyle, type Team, type Player, type Fixture } from '../services/googleSheets';
+import { fetchTeamById, fetchPlayersByTeam, fetchFixtures, type Team, type Player, type Fixture } from '../services/googleSheets';
+
+// Division style helper
+const getDivisionStyle = (division: string) => {
+  const styles: Record<string, { bgClass: string; textClass: string }> = {
+    'Mixed Open': { bgClass: 'bg-purple-500/20', textClass: 'text-purple-300' },
+    'Mens Open': { bgClass: 'bg-blue-500/20', textClass: 'text-blue-300' },
+    'Womens Open': { bgClass: 'bg-pink-500/20', textClass: 'text-pink-300' },
+    'Senior Mens': { bgClass: 'bg-amber-500/20', textClass: 'text-amber-300' },
+  };
+  return styles[division] || { bgClass: 'bg-gray-500/20', textClass: 'text-gray-300' };
+};
 
 const TeamProfilePage = () => {
   const { teamId } = useParams<{ teamId: string }>();
@@ -18,7 +29,7 @@ const TeamProfilePage = () => {
       try {
         const [teamData, playersData, fixturesData] = await Promise.all([
           fetchTeamById(teamId),
-          fetchPlayers(teamId),
+          fetchPlayersByTeam(teamId),
           fetchFixtures()
         ]);
         
@@ -118,9 +129,6 @@ const TeamProfilePage = () => {
               >
                 {team.teamName}
               </h1>
-              {team.coach && (
-                <p className="text-white/60 mt-1">Coach: {team.coach}</p>
-              )}
             </div>
           </div>
 
@@ -133,17 +141,6 @@ const TeamProfilePage = () => {
           )}
         </div>
       </header>
-
-      {/* Team Bio */}
-      {team.bio && (
-        <section className="px-4 sm:px-6 pb-8">
-          <div className="max-w-4xl mx-auto">
-            <p className="text-white/70 text-base sm:text-lg leading-relaxed">
-              {team.bio}
-            </p>
-          </div>
-        </section>
-      )}
 
       {/* Squad */}
       <section className="px-4 sm:px-6 pb-8">
@@ -164,18 +161,18 @@ const TeamProfilePage = () => {
                     {player.photoUrl ? (
                       <img 
                         src={player.photoUrl} 
-                        alt={player.name}
+                        alt={player.fullName}
                         className="w-10 h-10 rounded-full object-cover"
                       />
                     ) : (
                       <div className="w-10 h-10 rounded-full bg-[#CFFF2E]/20 flex items-center justify-center">
                         <span className="text-[#CFFF2E] font-bold text-sm">
-                          {player.name.charAt(0)}
+                          {player.fullName.charAt(0)}
                         </span>
                       </div>
                     )}
                     <div>
-                      <p className="text-white font-semibold text-sm">{player.nickname || player.name.split(' ')[0]}</p>
+                      <p className="text-white font-semibold text-sm">{player.fullName.split(' ')[0]}</p>
                       {player.number > 0 && (
                         <p className="text-white/40 text-xs">#{player.number}</p>
                       )}
@@ -213,7 +210,7 @@ const TeamProfilePage = () => {
                   >
                     <div>
                       <p className="text-[#CFFF2E] font-semibold">{fixture.time} · {fixture.field}</p>
-                      <p className="text-white text-sm">{fixture.day}, {fixture.date}</p>
+                      <p className="text-white text-sm">{fixture.date}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-white font-semibold">vs {opponent}</p>
