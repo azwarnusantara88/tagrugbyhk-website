@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Trophy, Calendar, MapPin, ChevronDown, Eye } from 'lucide-react';
+import { Trophy, MapPin, ChevronDown, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { fetchFixtures, fetchTeams, type Fixture, type Team } from '../services/googleSheets';
 
