@@ -14,7 +14,63 @@ const SHEET_GIDS = {
   INFORMATION: '1244739706',
   ANNOUNCEMENTS: '1344579919',
   SPONSORS: '1444420132',
+  PLAYERS: '1544360343',
+  NEWS: '1644270554',
 };
+
+// Types
+export interface Fixture {
+  date: string;
+  time: string;
+  division: string;
+  homeTeamId: string;
+  homeTeam: string;
+  homeScore: string;
+  awayTeamId: string;
+  awayTeam: string;
+  awayScore: string;
+  venue: string;
+  pitch: string;
+  matchType: string;
+  round: string;
+  completed: boolean;
+}
+
+export interface Team {
+  teamId: string;
+  teamName: string;
+  division: string;
+  logoUrl: string;
+  description?: string;
+  founded?: string;
+  captain?: string;
+  coach?: string;
+}
+
+export interface Player {
+  playerId: string;
+  playerName: string;
+  teamId: string;
+  teamName: string;
+  position: string;
+  jerseyNumber: string;
+  tries: number;
+  conversions: number;
+  totalPoints: number;
+}
+
+export interface NewsItem {
+  id: string;
+  slug: string;
+  title: string;
+  content: string;
+  excerpt: string;
+  date: string;
+  author: string;
+  imageUrl: string;
+  category: string;
+  tags: string[];
+}
 
 // Helper function to extract image URL from =IMAGE() formula
 function extractImageUrl(formula: string): string {
@@ -90,7 +146,7 @@ function parseCSVLine(line: string): string[] {
 }
 
 // Fetch fixtures data
-export async function getFixtures() {
+export async function getFixtures(): Promise<Fixture[]> {
   const data = await fetchSheetData(SHEET_GIDS.FIXTURES);
   
   return data.map((row: any) => ({
@@ -111,8 +167,11 @@ export async function getFixtures() {
   }));
 }
 
+// Alias for backwards compatibility
+export const fetchFixtures = getFixtures;
+
 // Fetch teams data with logo support
-export async function getTeams() {
+export async function getTeams(): Promise<Team[]> {
   const data = await fetchSheetData(SHEET_GIDS.TEAMS);
   
   return data.map((row: any) => ({
@@ -120,7 +179,40 @@ export async function getTeams() {
     teamName: row.TeamName || '',
     division: row.Division || '',
     logoUrl: extractImageUrl(row.LOGO || ''),
+    description: row.Description || '',
+    founded: row.Founded || '',
+    captain: row.Captain || '',
+    coach: row.Coach || '',
   }));
+}
+
+// Fetch single team by ID
+export async function fetchTeamById(teamId: string): Promise<Team | null> {
+  const teams = await getTeams();
+  return teams.find(t => t.teamId === teamId) || null;
+}
+
+// Fetch players data
+export async function getPlayers(): Promise<Player[]> {
+  const data = await fetchSheetData(SHEET_GIDS.PLAYERS);
+  
+  return data.map((row: any) => ({
+    playerId: row.PlayerID || '',
+    playerName: row.PlayerName || '',
+    teamId: row.TeamID || '',
+    teamName: row.TeamName || '',
+    position: row.Position || '',
+    jerseyNumber: row.JerseyNumber || '',
+    tries: parseInt(row.Tries) || 0,
+    conversions: parseInt(row.Conversions) || 0,
+    totalPoints: parseInt(row.TotalPoints) || 0,
+  }));
+}
+
+// Fetch players by team ID
+export async function fetchPlayersByTeam(teamId: string): Promise<Player[]> {
+  const players = await getPlayers();
+  return players.filter(p => p.teamId === teamId);
 }
 
 // Fetch standings data
@@ -192,4 +284,31 @@ export async function getSponsors() {
     tier: row.Tier || '',
     order: parseInt(row.Order) || 0,
   }));
+}
+
+// Fetch news data
+export async function getNews(): Promise<NewsItem[]> {
+  const data = await fetchSheetData(SHEET_GIDS.NEWS);
+  
+  return data.map((row: any) => ({
+    id: row.ID || '',
+    slug: row.Slug || '',
+    title: row.Title || '',
+    content: row.Content || '',
+    excerpt: row.Excerpt || '',
+    date: row.Date || '',
+    author: row.Author || '',
+    imageUrl: extractImageUrl(row.ImageUrl || ''),
+    category: row.Category || '',
+    tags: row.Tags ? row.Tags.split(',').map((t: string) => t.trim()) : [],
+  }));
+}
+
+// Alias for backwards compatibility
+export const fetchNews = getNews;
+
+// Fetch news by slug
+export async function fetchNewsBySlug(slug: string): Promise<NewsItem | null> {
+  const news = await getNews();
+  return news.find(n => n.slug === slug) || null;
 }
