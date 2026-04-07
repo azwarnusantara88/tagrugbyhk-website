@@ -4,28 +4,41 @@ import { useState, useEffect } from 'react';
 import { getFixtures, getTeams } from '@/services/googleSheets';
 import { format, parseISO, isValid } from 'date-fns';
 
+// FIXTURES: Date, Day, Time, Field, HomeTeamID, HomeTeam, HomeScore, AwayTeamID, AwayTeam, AwayScore, Division, Round, Status, Notes
 interface Fixture {
   date: string;
+  day: string;
   time: string;
-  division: string;
+  field: string;
   homeTeamId: string;
   homeTeam: string;
   homeScore: string;
   awayTeamId: string;
   awayTeam: string;
   awayScore: string;
-  venue: string;
-  pitch: string;
-  matchType: string;
+  division: string;
   round: string;
-  completed: boolean;
+  status: string;
+  notes: string;
 }
 
+// TEAMS: TeamID, TeamName, Division, Region, Captain, Coach, LogoURL, LOGO, ShortCode, Category, Contact, Active, Status, Founded, Website
+// logoUrl comes from Column G (LogoURL) - direct image URL
 interface Team {
   teamId: string;
   teamName: string;
   division: string;
+  region: string;
+  captain: string;
+  coach: string;
   logoUrl: string;
+  shortCode: string;
+  category: string;
+  contact: string;
+  active: boolean;
+  status: string;
+  founded: string;
+  website: string;
 }
 
 export default function FixturesSection() {
@@ -81,6 +94,11 @@ export default function FixturesSection() {
     if (!teamId) return '';
     const team = teams.find(t => t.teamId === teamId);
     return team?.logoUrl || '';
+  };
+
+  // Check if match is completed based on status
+  const isMatchCompleted = (status: string): boolean => {
+    return status?.toLowerCase() === 'completed' || status?.toLowerCase() === 'finished';
   };
 
   // Format date for display
@@ -161,6 +179,7 @@ export default function FixturesSection() {
                   {fixturesByDate[date].map((fixture, index) => {
                     const homeLogo = getTeamLogo(fixture.homeTeamId);
                     const awayLogo = getTeamLogo(fixture.awayTeamId);
+                    const completed = isMatchCompleted(fixture.status);
                     
                     return (
                       <div key={index} className="p-6 hover:bg-gray-50 transition-colors">
@@ -170,8 +189,8 @@ export default function FixturesSection() {
                             <span className="bg-gray-100 px-3 py-1 rounded-full">
                               {fixture.time}
                             </span>
-                            <span>{fixture.venue}</span>
-                            {fixture.pitch && <span>Pitch {fixture.pitch}</span>}
+                            <span>{fixture.field}</span>
+                            {fixture.round && <span>Round {fixture.round}</span>}
                           </div>
 
                           {/* Teams & Score */}
@@ -195,7 +214,7 @@ export default function FixturesSection() {
 
                             {/* Score */}
                             <div className="bg-gray-100 px-4 py-2 rounded-lg font-bold text-lg min-w-[100px] text-center">
-                              {fixture.completed ? (
+                              {completed ? (
                                 <span className="text-gray-900">
                                   {fixture.homeScore} - {fixture.awayScore}
                                 </span>
@@ -222,11 +241,15 @@ export default function FixturesSection() {
                             </div>
                           </div>
 
-                          {/* Match Type */}
+                          {/* Match Status */}
                           <div className="text-sm text-gray-500 text-right lg:w-32">
-                            {fixture.matchType && (
-                              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
-                                {fixture.matchType}
+                            {fixture.status && (
+                              <span className={`px-3 py-1 rounded-full ${
+                                completed 
+                                  ? 'bg-green-100 text-green-800' 
+                                  : 'bg-blue-100 text-blue-800'
+                              }`}>
+                                {fixture.status}
                               </span>
                             )}
                           </div>
