@@ -115,10 +115,14 @@ export interface LadderStanding {
   form: string;
 }
 
-// CONFIG: Key, Value
+// CONFIG: Key, Value (with additional properties for backwards compatibility)
 export interface Config {
   key: string;
   value: string;
+  // Additional properties expected by other components
+  informationPackUrl?: string;
+  venue?: string;
+  tournamentDate?: string;
 }
 
 // Helper function to extract image URL from =IMAGE() formula
@@ -133,9 +137,7 @@ const fetchSheetData = cache(async (gid: string) => {
   const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${gid}`;
   
   try {
-    const response = await fetch(url, {
-      next: { revalidate: 300 }, // Revalidate every 5 minutes
-    });
+    const response = await fetch(url);
     
     if (!response.ok) {
       throw new Error(`Failed to fetch sheet data: ${response.statusText}`);
@@ -407,6 +409,9 @@ export async function getConfig(): Promise<Config[]> {
     value: row.Value || '',
   }));
 }
+
+// Alias for backwards compatibility
+export const fetchConfig = getConfig;
 
 // Get a specific config value by key
 export async function getConfigValue(key: string): Promise<string> {
