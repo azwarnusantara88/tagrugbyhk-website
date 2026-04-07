@@ -5,18 +5,15 @@ export const revalidate = 300;
 
 const SHEET_ID = '1AertW5yTqPz0Sbzxe2ODF74CikTY_hQS9KMbQSsWkuM';
 
-// Sheet GIDs
+// Sheet GIDs - UPDATED WITH CORRECT IDs
 const SHEET_GIDS = {
   FIXTURES: '0',
   TEAMS: '1275974115',
-  LADDER: '1885819712',
-  LOCATIONS: '114025676',
-  INFORMATION: '1244739706',
-  ANNOUNCEMENTS: '1344579919',
-  SPONSORS: '1444420132',
-  PLAYERS: '1544360343',
-  NEWS: '1644270554',
-  CONFIG: '1744180765',
+  PLAYERS: '652663105',
+  NEWS: '1320981095',
+  LADDER: '397145122',
+  CONFIG: '446704132',
+  DATA: '104865886',
 };
 
 // Types
@@ -317,57 +314,6 @@ export async function getLadder(): Promise<LadderStanding[]> {
 
 // Alias for backwards compatibility
 export const getStandings = getLadder;
-
-// Fetch locations data
-export async function getLocations() {
-  const data = await fetchSheetData(SHEET_GIDS.LOCATIONS);
-  
-  return data.map((row: any) => ({
-    venue: row.Venue || '',
-    address: row.Address || '',
-    mapLink: row.MapLink || '',
-    directions: row.Directions || '',
-    facilities: row.Facilities || '',
-  }));
-}
-
-// Fetch information data
-export async function getInformation() {
-  const data = await fetchSheetData(SHEET_GIDS.INFORMATION);
-  
-  return data.map((row: any) => ({
-    category: row.Category || '',
-    title: row.Title || '',
-    content: row.Content || '',
-    order: parseInt(row.Order) || 0,
-  }));
-}
-
-// Fetch announcements data
-export async function getAnnouncements() {
-  const data = await fetchSheetData(SHEET_GIDS.ANNOUNCEMENTS);
-  
-  return data.map((row: any) => ({
-    date: row.Date || '',
-    title: row.Title || '',
-    content: row.Content || '',
-    priority: row.Priority || 'normal',
-    active: row.Active === 'TRUE' || row.Active === 'true',
-  }));
-}
-
-// Fetch sponsors data
-export async function getSponsors() {
-  const data = await fetchSheetData(SHEET_GIDS.SPONSORS);
-  
-  return data.map((row: any) => ({
-    name: row.Name || '',
-    logoUrl: extractImageUrl(row.LogoUrl || ''),
-    website: row.Website || '',
-    tier: row.Tier || '',
-    order: parseInt(row.Order) || 0,
-  }));
-}
 
 // Fetch news data
 // NEWS: ArticleID, Title, Author, Date, Category, Excerpt, Content, FeaturedImage, GalleryImages, Published, Slug, Tags, Views
