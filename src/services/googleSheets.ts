@@ -9,67 +9,113 @@ const SHEET_ID = '1AertW5yTqPz0Sbzxe2ODF74CikTY_hQS9KMbQSsWkuM';
 const SHEET_GIDS = {
   FIXTURES: '0',
   TEAMS: '1275974115',
-  STANDINGS: '1885819712',
+  LADDER: '1885819712',
   LOCATIONS: '114025676',
   INFORMATION: '1244739706',
   ANNOUNCEMENTS: '1344579919',
   SPONSORS: '1444420132',
   PLAYERS: '1544360343',
   NEWS: '1644270554',
+  CONFIG: '1744180765',
 };
 
 // Types
+
+// FIXTURES: Date, Day, Time, Field, HomeTeamID, HomeTeam, HomeScore, AwayTeamID, AwayTeam, AwayScore, Division, Round, Status, Notes
 export interface Fixture {
   date: string;
+  day: string;
   time: string;
-  division: string;
+  field: string;
   homeTeamId: string;
   homeTeam: string;
   homeScore: string;
   awayTeamId: string;
   awayTeam: string;
   awayScore: string;
-  venue: string;
-  pitch: string;
-  matchType: string;
+  division: string;
   round: string;
-  completed: boolean;
+  status: string;
+  notes: string;
 }
 
+// TEAMS: TeamID, TeamName, Division, Region, Captain, Coach, LogoURL, LOGO, ShortCode, Category, Contact, Active, Status, Founded, Website
 export interface Team {
   teamId: string;
   teamName: string;
   division: string;
-  logoUrl: string;
-  description?: string;
-  founded?: string;
-  captain?: string;
-  coach?: string;
+  region: string;
+  captain: string;
+  coach: string;
+  logoUrl: string;      // From LogoURL column (Column G) - direct image URL
+  shortCode: string;
+  category: string;
+  contact: string;
+  active: boolean;
+  status: string;
+  founded: string;
+  website: string;
 }
 
+// PLAYERS: PlayerID, TeamID, FullName, TeamName, Country, Number, Position, PhotoURL, PlayersToWatch, Tries, Weight, Nationality, Bio, Status, Debut
 export interface Player {
   playerId: string;
-  playerName: string;
   teamId: string;
+  fullName: string;
   teamName: string;
+  country: string;
+  number: string;
   position: string;
-  jerseyNumber: string;
+  photoUrl: string;
+  playersToWatch: boolean;
   tries: number;
-  conversions: number;
-  totalPoints: number;
+  weight: string;
+  nationality: string;
+  bio: string;
+  status: string;
+  debut: string;
 }
 
+// NEWS: ArticleID, Title, Author, Date, Category, Excerpt, Content, FeaturedImage, GalleryImages, Published, Slug, Tags, Views
 export interface NewsItem {
-  id: string;
-  slug: string;
+  articleId: string;
   title: string;
-  content: string;
-  excerpt: string;
-  date: string;
   author: string;
-  imageUrl: string;
+  date: string;
   category: string;
+  excerpt: string;
+  content: string;
+  featuredImage: string;
+  galleryImages: string;
+  published: boolean;
+  slug: string;
   tags: string[];
+  views: number;
+}
+
+// LADDER: Position, TeamID, TeamName, Division, Played, Won, Drawn, Lost, PointsFor, PointsAgainst, PointsDiff, BonusPoints, TotalPoints, WinPercent, Form
+export interface LadderStanding {
+  position: number;
+  teamId: string;
+  teamName: string;
+  division: string;
+  played: number;
+  won: number;
+  drawn: number;
+  lost: number;
+  pointsFor: number;
+  pointsAgainst: number;
+  pointsDiff: number;
+  bonusPoints: number;
+  totalPoints: number;
+  winPercent: number;
+  form: string;
+}
+
+// CONFIG: Key, Value
+export interface Config {
+  key: string;
+  value: string;
 }
 
 // Helper function to extract image URL from =IMAGE() formula
@@ -146,24 +192,25 @@ function parseCSVLine(line: string): string[] {
 }
 
 // Fetch fixtures data
+// FIXTURES: Date, Day, Time, Field, HomeTeamID, HomeTeam, HomeScore, AwayTeamID, AwayTeam, AwayScore, Division, Round, Status, Notes
 export async function getFixtures(): Promise<Fixture[]> {
   const data = await fetchSheetData(SHEET_GIDS.FIXTURES);
   
   return data.map((row: any) => ({
     date: row.Date || '',
+    day: row.Day || '',
     time: row.Time || '',
-    division: row.Division || '',
+    field: row.Field || '',
     homeTeamId: row.HomeTeamID || '',
     homeTeam: row.HomeTeam || '',
     homeScore: row.HomeScore || '',
     awayTeamId: row.AwayTeamID || '',
     awayTeam: row.AwayTeam || '',
     awayScore: row.AwayScore || '',
-    venue: row.Venue || '',
-    pitch: row.Pitch || '',
-    matchType: row.MatchType || '',
+    division: row.Division || '',
     round: row.Round || '',
-    completed: row.Completed === 'TRUE' || row.Completed === 'true',
+    status: row.Status || '',
+    notes: row.Notes || '',
   }));
 }
 
@@ -171,6 +218,7 @@ export async function getFixtures(): Promise<Fixture[]> {
 export const fetchFixtures = getFixtures;
 
 // Fetch teams data with logo support
+// TEAMS: TeamID, TeamName, Division, Region, Captain, Coach, LogoURL, LOGO, ShortCode, Category, Contact, Active, Status, Founded, Website
 export async function getTeams(): Promise<Team[]> {
   const data = await fetchSheetData(SHEET_GIDS.TEAMS);
   
@@ -178,11 +226,17 @@ export async function getTeams(): Promise<Team[]> {
     teamId: row.TeamID || '',
     teamName: row.TeamName || '',
     division: row.Division || '',
-    logoUrl: extractImageUrl(row.LOGO || ''),
-    description: row.Description || '',
-    founded: row.Founded || '',
+    region: row.Region || '',
     captain: row.Captain || '',
     coach: row.Coach || '',
+    logoUrl: row.LogoURL || '', // Column G - direct image URL
+    shortCode: row.ShortCode || '',
+    category: row.Category || '',
+    contact: row.Contact || '',
+    active: row.Active === 'TRUE' || row.Active === 'true',
+    status: row.Status || '',
+    founded: row.Founded || '',
+    website: row.Website || '',
   }));
 }
 
@@ -193,19 +247,26 @@ export async function fetchTeamById(teamId: string): Promise<Team | null> {
 }
 
 // Fetch players data
+// PLAYERS: PlayerID, TeamID, FullName, TeamName, Country, Number, Position, PhotoURL, PlayersToWatch, Tries, Weight, Nationality, Bio, Status, Debut
 export async function getPlayers(): Promise<Player[]> {
   const data = await fetchSheetData(SHEET_GIDS.PLAYERS);
   
   return data.map((row: any) => ({
     playerId: row.PlayerID || '',
-    playerName: row.PlayerName || '',
     teamId: row.TeamID || '',
+    fullName: row.FullName || '',
     teamName: row.TeamName || '',
+    country: row.Country || '',
+    number: row.Number || '',
     position: row.Position || '',
-    jerseyNumber: row.JerseyNumber || '',
+    photoUrl: extractImageUrl(row.PhotoURL || ''),
+    playersToWatch: row.PlayersToWatch === 'TRUE' || row.PlayersToWatch === 'true',
     tries: parseInt(row.Tries) || 0,
-    conversions: parseInt(row.Conversions) || 0,
-    totalPoints: parseInt(row.TotalPoints) || 0,
+    weight: row.Weight || '',
+    nationality: row.Nationality || '',
+    bio: row.Bio || '',
+    status: row.Status || '',
+    debut: row.Debut || '',
   }));
 }
 
@@ -215,25 +276,32 @@ export async function fetchPlayersByTeam(teamId: string): Promise<Player[]> {
   return players.filter(p => p.teamId === teamId);
 }
 
-// Fetch standings data
-export async function getStandings() {
-  const data = await fetchSheetData(SHEET_GIDS.STANDINGS);
+// Fetch ladder/standings data
+// LADDER: Position, TeamID, TeamName, Division, Played, Won, Drawn, Lost, PointsFor, PointsAgainst, PointsDiff, BonusPoints, TotalPoints, WinPercent, Form
+export async function getLadder(): Promise<LadderStanding[]> {
+  const data = await fetchSheetData(SHEET_GIDS.LADDER);
   
   return data.map((row: any) => ({
-    division: row.Division || '',
     position: parseInt(row.Position) || 0,
-    team: row.Team || '',
+    teamId: row.TeamID || '',
+    teamName: row.TeamName || '',
+    division: row.Division || '',
     played: parseInt(row.Played) || 0,
     won: parseInt(row.Won) || 0,
     drawn: parseInt(row.Drawn) || 0,
     lost: parseInt(row.Lost) || 0,
     pointsFor: parseInt(row.PointsFor) || 0,
     pointsAgainst: parseInt(row.PointsAgainst) || 0,
-    pointsDifference: parseInt(row.PointsDifference) || 0,
+    pointsDiff: parseInt(row.PointsDiff) || 0,
     bonusPoints: parseInt(row.BonusPoints) || 0,
     totalPoints: parseInt(row.TotalPoints) || 0,
+    winPercent: parseFloat(row.WinPercent) || 0,
+    form: row.Form || '',
   }));
 }
+
+// Alias for backwards compatibility
+export const getStandings = getLadder;
 
 // Fetch locations data
 export async function getLocations() {
@@ -287,20 +355,24 @@ export async function getSponsors() {
 }
 
 // Fetch news data
+// NEWS: ArticleID, Title, Author, Date, Category, Excerpt, Content, FeaturedImage, GalleryImages, Published, Slug, Tags, Views
 export async function getNews(): Promise<NewsItem[]> {
   const data = await fetchSheetData(SHEET_GIDS.NEWS);
   
   return data.map((row: any) => ({
-    id: row.ID || '',
-    slug: row.Slug || '',
+    articleId: row.ArticleID || '',
     title: row.Title || '',
-    content: row.Content || '',
-    excerpt: row.Excerpt || '',
-    date: row.Date || '',
     author: row.Author || '',
-    imageUrl: extractImageUrl(row.ImageUrl || ''),
+    date: row.Date || '',
     category: row.Category || '',
+    excerpt: row.Excerpt || '',
+    content: row.Content || '',
+    featuredImage: extractImageUrl(row.FeaturedImage || ''),
+    galleryImages: row.GalleryImages || '',
+    published: row.Published === 'TRUE' || row.Published === 'true',
+    slug: row.Slug || '',
     tags: row.Tags ? row.Tags.split(',').map((t: string) => t.trim()) : [],
+    views: parseInt(row.Views) || 0,
   }));
 }
 
@@ -311,4 +383,22 @@ export const fetchNews = getNews;
 export async function fetchNewsBySlug(slug: string): Promise<NewsItem | null> {
   const news = await getNews();
   return news.find(n => n.slug === slug) || null;
+}
+
+// Fetch config data
+// CONFIG: Key, Value
+export async function getConfig(): Promise<Config[]> {
+  const data = await fetchSheetData(SHEET_GIDS.CONFIG);
+  
+  return data.map((row: any) => ({
+    key: row.Key || '',
+    value: row.Value || '',
+  }));
+}
+
+// Get a specific config value by key
+export async function getConfigValue(key: string): Promise<string> {
+  const config = await getConfig();
+  const item = config.find(c => c.key === key);
+  return item?.value || '';
 }
