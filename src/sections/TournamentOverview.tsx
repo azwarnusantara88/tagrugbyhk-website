@@ -15,7 +15,7 @@ const TournamentOverview = () => {
   const [config, setConfig] = useState<Config>({
     informationPackUrl: '',
     tournamentName: 'Tag Asia Cup 2026',
-    tournamentDates: 'April 11-12, 2026',
+    tournamentDate: 'April 11-12, 2026'
     venue: 'J-Green Sakai City',
   });
 
