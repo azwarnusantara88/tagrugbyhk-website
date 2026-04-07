@@ -1,245 +1,195 @@
+import { cache } from 'react';
+
+// Revalidate every 5 minutes
+export const revalidate = 300;
+
 const SHEET_ID = '1AertW5yTqPz0Sbzxe2ODF74CikTY_hQS9KMbQSsWkuM';
 
+// Sheet GIDs
 const SHEET_GIDS = {
   FIXTURES: '0',
   TEAMS: '1275974115',
-  PLAYERS: '652663105',
-  NEWS: '1320981095',
-  LADDERS: '397145122',
-  CONFIG: '446704132',
-  DATA: '104865886',
+  STANDINGS: '1885819712',
+  LOCATIONS: '114025676',
+  INFORMATION: '1244739706',
+  ANNOUNCEMENTS: '1344579919',
+  SPONSORS: '1444420132',
 };
 
-export interface Fixture {
-  matchId: string;
-  date: string;
-  time: string;
-  field: string;
-  division: string;
-  homeTeam: string;
-  awayTeam: string;
-  homeScore: number;
-  awayScore: number;
-  status: 'SCHEDULED' | 'LIVE' | 'FINAL';
-  day?: string;
-}
-
-export interface Team {
-  teamId: string;
-  teamName: string;
-  division: string;
-  region: string;
-  captain: string;
-  logoUrl: string;
-  wins: number;
-  losses: number;
-  points: number;
-}
-
-export interface Player {
-  playerId: string;
-  teamId: string;
-  fullName: string;
-  teamName: string;
-  country: string;
-  number: number;
-  position: string;
-  photoUrl: string;
-  playersToWatch: boolean;
-}
-
-export interface NewsItem {
-  slug: string;
-  title: string;
-  date: string;
-  excerpt: string;
-  imageUrl: string;
-  content: string;
-  author: string;
-}
-
-export interface Standing {
-  teamId: string;
-  teamName: string;
-  division: string;
-  played: number;
-  won: number;
-  lost: number;
-  pointsFor: number;
-  pointsAgainst: number;
-  pointsDiff: number;
-  totalPoints: number;
-  position: number;
-}
-
-export interface Config {
-  informationPackUrl: string;
-  tournamentName: string;
-  tournamentDate: string;
-  venue: string;
-}
-
-async function fetchSheetData(gid: string): Promise<string[][]> {
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${gid}`;
-  try {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    return parseCSV(await response.text());
-  } catch (error) {
-    console.error('Error fetching sheet data:', error);
-    return [];
-  }
-}
-
-function parseCSV(csvText: string): string[][] {
-  const lines = csvText.trim().split('\n');
-  return lines.map(line => {
-    const result: string[] = [];
-    let current = '';
-    let inQuotes = false;
-    for (const char of line) {
-      if (char === '"') inQuotes = !inQuotes;
-      else if (char === ',' && !inQuotes) {
-        result.push(current.trim());
-        current = '';
-      } else current += char;
-    }
-    result.push(current.trim());
-    return result;
-  });
-}
-
-// Extract image URL from =IMAGE() formula
+// Helper function to extract image URL from =IMAGE() formula
 function extractImageUrl(formula: string): string {
   if (!formula) return '';
   const match = formula.match(/=IMAGE\(["']([^"']+)["']\)/i);
   return match ? match[1] : formula;
 }
 
-export async function fetchFixtures(): Promise<Fixture[]> {
-  const data = await fetchSheetData(SHEET_GIDS.FIXTURES);
-  if (data.length < 2) return [];
-  return data.slice(1).map(row => ({
-    matchId: row[0] || '',
-    date: row[1] || '',
-    time: row[2] || '',
-    field: row[3] || '',
-    division: row[4] || '',
-    homeTeam: row[5] || '',
-    awayTeam: row[6] || '',
-    homeScore: parseInt(row[7]) || 0,
-    awayScore: parseInt(row[8]) || 0,
-    status: (row[9] as 'SCHEDULED' | 'LIVE' | 'FINAL') || 'SCHEDULED',
-    day: row[10] || '',
-  }));
-}
+// Cache the fetch to avoid redundant requests
+const fetchSheetData = cache(async (gid: string) => {
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${gid}`;
+  
+  try {
+    const response = await fetch(url, {
+      next: { revalidate: 300 }, // Revalidate every 5 minutes
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch sheet data: ${response.statusText}`);
+    }
+    
+    const csvText = await response.text();
+    return parseCSV(csvText);
+  } catch (error) {
+    console.error('Error fetching sheet data:', error);
+    return [];
+  }
+});
 
-export async function fetchTeams(): Promise<Team[]> {
-  const data = await fetchSheetData(SHEET_GIDS.TEAMS);
-  if (data.length < 2) return [];
-  return data.slice(1).map(row => ({
-    teamId: row[0] || '',
-    teamName: row[1] || '',
-    division: row[2] || '',
-    region: row[3] || '',
-    captain: row[4] || '',
-    logoUrl: extractImageUrl(row[7] || ''), // ← CHANGED: Column H (index 7) for LOGO
-    wins: parseInt(row[8]) || 0,
-    losses: parseInt(row[9]) || 0,
-    points: parseInt(row[10]) || 0,
-  }));
-}
-
-export async function fetchPlayers(): Promise<Player[]> {
-  const data = await fetchSheetData(SHEET_GIDS.PLAYERS);
-  if (data.length < 2) return [];
-  return data.slice(1).map(row => ({
-    playerId: row[0] || '',
-    teamId: row[1] || '',
-    fullName: row[2] || '',
-    teamName: row[3] || '',
-    country: row[4] || '',
-    number: parseInt(row[5]) || 0,
-    position: row[6] || '',
-    photoUrl: extractImageUrl(row[7] || ''),
-    playersToWatch: row[8]?.toLowerCase() === 'true' || row[8] === 'TRUE',
-  }));
-}
-
-export async function fetchPlayersToWatch(): Promise<Player[]> {
-  const allPlayers = await fetchPlayers();
-  return allPlayers.filter(player => player.playersToWatch);
-}
-
-export async function fetchNews(): Promise<NewsItem[]> {
-  const data = await fetchSheetData(SHEET_GIDS.NEWS);
-  if (data.length < 2) return [];
-  return data.slice(1).map(row => ({
-    slug: row[0] || '',
-    title: row[1] || '',
-    date: row[2] || '',
-    excerpt: row[3] || '',
-    imageUrl: extractImageUrl(row[4] || ''),
-    content: row[5] || '',
-    author: row[6] || '',
-  }));
-}
-
-export async function fetchStandings(): Promise<Standing[]> {
-  const data = await fetchSheetData(SHEET_GIDS.LADDERS);
-  if (data.length < 2) return [];
-  return data.slice(1).map(row => ({
-    teamId: row[0] || '',
-    teamName: row[1] || '',
-    division: row[2] || '',
-    played: parseInt(row[3]) || 0,
-    won: parseInt(row[4]) || 0,
-    lost: parseInt(row[5]) || 0,
-    pointsFor: parseInt(row[6]) || 0,
-    pointsAgainst: parseInt(row[7]) || 0,
-    pointsDiff: parseInt(row[8]) || 0,
-    totalPoints: parseInt(row[9]) || 0,
-    position: parseInt(row[10]) || 0,
-  }));
-}
-
-export async function fetchConfig(): Promise<Config> {
-  const data = await fetchSheetData(SHEET_GIDS.CONFIG);
-  const config: Config = {
-    informationPackUrl: '',
-    tournamentName: 'Tag Asia Cup 2026',
-    tournamentDate: 'April 11-12, 2026',
-    venue: 'J-Green Sakai, Osaka',
-  };
-  if (data.length < 2) return config;
-  data.slice(1).forEach(row => {
-    const key = row[0]?.toLowerCase();
-    if (key === 'informationpackurl') config.informationPackUrl = row[1] || '';
-    if (key === 'tournamentname') config.tournamentName = row[1] || '';
-    if (key === 'tournamentdate') config.tournamentDate = row[1] || '';
-    if (key === 'venue') config.venue = row[1] || '';
+// Parse CSV text into array of objects
+function parseCSV(csvText: string): any[] {
+  const lines = csvText.split('\n').filter(line => line.trim());
+  if (lines.length < 2) return [];
+  
+  const headers = parseCSVLine(lines[0]);
+  
+  return lines.slice(1).map(line => {
+    const values = parseCSVLine(line);
+    const row: any = {};
+    headers.forEach((header, index) => {
+      row[header] = values[index] || '';
+    });
+    return row;
   });
-  return config;
 }
 
-export async function fetchTeamById(teamId: string): Promise<Team | null> {
-  const teams = await fetchTeams();
-  return teams.find(team => team.teamId === teamId) || null;
+// Parse a single CSV line handling quoted values
+function parseCSVLine(line: string): string[] {
+  const result: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    
+    if (char === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === ',' && !inQuotes) {
+      result.push(current.trim());
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  
+  result.push(current.trim());
+  return result;
 }
 
-export async function fetchPlayersByTeam(teamId: string): Promise<Player[]> {
-  const players = await fetchPlayers();
-  return players.filter(player => player.teamId === teamId);
+// Fetch fixtures data
+export async function getFixtures() {
+  const data = await fetchSheetData(SHEET_GIDS.FIXTURES);
+  
+  return data.map((row: any) => ({
+    date: row.Date || '',
+    time: row.Time || '',
+    division: row.Division || '',
+    homeTeamId: row.HomeTeamID || '',
+    homeTeam: row.HomeTeam || '',
+    homeScore: row.HomeScore || '',
+    awayTeamId: row.AwayTeamID || '',
+    awayTeam: row.AwayTeam || '',
+    awayScore: row.AwayScore || '',
+    venue: row.Venue || '',
+    pitch: row.Pitch || '',
+    matchType: row.MatchType || '',
+    round: row.Round || '',
+    completed: row.Completed === 'TRUE' || row.Completed === 'true',
+  }));
 }
 
-export async function fetchNewsBySlug(slug: string): Promise<NewsItem | null> {
-  const news = await fetchNews();
-  return news.find(item => item.slug === slug) || null;
+// Fetch teams data with logo support
+export async function getTeams() {
+  const data = await fetchSheetData(SHEET_GIDS.TEAMS);
+  
+  return data.map((row: any) => ({
+    teamId: row.TeamID || '',
+    teamName: row.TeamName || '',
+    division: row.Division || '',
+    logoUrl: extractImageUrl(row.LOGO || ''),
+  }));
 }
 
-export async function fetchFixturesByTeam(teamId: string): Promise<Fixture[]> {
-  const fixtures = await fetchFixtures();
-  return fixtures.filter(
-    f => f.homeTeam.includes(teamId) || f.awayTeam.includes(teamId)
-  );
+// Fetch standings data
+export async function getStandings() {
+  const data = await fetchSheetData(SHEET_GIDS.STANDINGS);
+  
+  return data.map((row: any) => ({
+    division: row.Division || '',
+    position: parseInt(row.Position) || 0,
+    team: row.Team || '',
+    played: parseInt(row.Played) || 0,
+    won: parseInt(row.Won) || 0,
+    drawn: parseInt(row.Drawn) || 0,
+    lost: parseInt(row.Lost) || 0,
+    pointsFor: parseInt(row.PointsFor) || 0,
+    pointsAgainst: parseInt(row.PointsAgainst) || 0,
+    pointsDifference: parseInt(row.PointsDifference) || 0,
+    bonusPoints: parseInt(row.BonusPoints) || 0,
+    totalPoints: parseInt(row.TotalPoints) || 0,
+  }));
+}
+
+// Fetch locations data
+export async function getLocations() {
+  const data = await fetchSheetData(SHEET_GIDS.LOCATIONS);
+  
+  return data.map((row: any) => ({
+    venue: row.Venue || '',
+    address: row.Address || '',
+    mapLink: row.MapLink || '',
+    directions: row.Directions || '',
+    facilities: row.Facilities || '',
+  }));
+}
+
+// Fetch information data
+export async function getInformation() {
+  const data = await fetchSheetData(SHEET_GIDS.INFORMATION);
+  
+  return data.map((row: any) => ({
+    category: row.Category || '',
+    title: row.Title || '',
+    content: row.Content || '',
+    order: parseInt(row.Order) || 0,
+  }));
+}
+
+// Fetch announcements data
+export async function getAnnouncements() {
+  const data = await fetchSheetData(SHEET_GIDS.ANNOUNCEMENTS);
+  
+  return data.map((row: any) => ({
+    date: row.Date || '',
+    title: row.Title || '',
+    content: row.Content || '',
+    priority: row.Priority || 'normal',
+    active: row.Active === 'TRUE' || row.Active === 'true',
+  }));
+}
+
+// Fetch sponsors data
+export async function getSponsors() {
+  const data = await fetchSheetData(SHEET_GIDS.SPONSORS);
+  
+  return data.map((row: any) => ({
+    name: row.Name || '',
+    logoUrl: extractImageUrl(row.LogoUrl || ''),
+    website: row.Website || '',
+    tier: row.Tier || '',
+    order: parseInt(row.Order) || 0,
+  }));
 }
