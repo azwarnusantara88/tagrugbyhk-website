@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Calendar, User, Newspaper, Search } from 'lucide-react';
+import { ArrowLeft, Calendar, Newspaper, Search } from 'lucide-react';
 import { fetchNews, type NewsItem } from '../services/googleSheets';
 
 const NewsListPage = () => {
