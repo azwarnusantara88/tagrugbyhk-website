@@ -65,7 +65,7 @@ export interface Player {
   fullName: string;
   teamName: string;
   country: string;
-  number: string;
+  number: number;  // Jersey number as number for comparison
   position: string;
   photoUrl: string;
   playersToWatch: boolean;
@@ -123,6 +123,7 @@ export interface Config {
   informationPackUrl?: string;
   venue?: string;
   tournamentDate?: string;
+  tournamentName?: string;
 }
 
 // Helper function to extract image URL from =IMAGE() formula
@@ -265,7 +266,7 @@ export async function getPlayers(): Promise<Player[]> {
     fullName: row.FullName || '',
     teamName: row.TeamName || '',
     country: row.Country || '',
-    number: row.Number || '',
+    number: parseInt(row.Number) || 0,
     position: row.Position || '',
     photoUrl: extractImageUrl(row.PhotoURL || ''),
     playersToWatch: row.PlayersToWatch === 'TRUE' || row.PlayersToWatch === 'true',
@@ -399,7 +400,7 @@ export async function fetchNewsBySlug(slug: string): Promise<NewsItem | null> {
   return news.find(n => n.slug === slug) || null;
 }
 
-// Fetch config data
+// Fetch config data (returns array of key-value pairs)
 // CONFIG: Key, Value
 export async function getConfig(): Promise<Config[]> {
   const data = await fetchSheetData(SHEET_GIDS.CONFIG);
@@ -412,6 +413,24 @@ export async function getConfig(): Promise<Config[]> {
 
 // Alias for backwards compatibility
 export const fetchConfig = getConfig;
+
+// Fetch config as a single object (for components expecting Config object)
+export async function getConfigObject(): Promise<Config> {
+  const configArray = await getConfig();
+  const configObject: any = {};
+  
+  configArray.forEach((item: Config) => {
+    if (item.key) {
+      configObject[item.key] = item.value;
+    }
+  });
+  
+  // Add key/value to match Config interface
+  configObject.key = 'config';
+  configObject.value = 'loaded';
+  
+  return configObject as Config;
+}
 
 // Get a specific config value by key
 export async function getConfigValue(key: string): Promise<string> {
