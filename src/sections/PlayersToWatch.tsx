@@ -1,33 +1,60 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Star } from 'lucide-react';
+import { Star, Shield, Flag } from 'lucide-react';
+import { fetchPlayersToWatch, fetchTeams, type Player, type Team } from '../services/googleSheets';
 
 gsap.registerPlugin(ScrollTrigger);
 
-interface Player {
-  name: string;
-  position: string;
-  stats: string;
-  highlight: string;
+interface PlayerWithTeam extends Player {
+  teamLogo?: string;
+  teamDivision?: string;
 }
 
 const PlayersToWatch = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
+  const [players, setPlayers] = useState<PlayerWithTeam[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const players: Player[] = [
-    { name: 'T. Lau', position: 'Captain', stats: '45 Caps', highlight: 'Top Try Scorer' },
-    { name: 'M. Cheng', position: 'Captain', stats: '38 Caps', highlight: 'Playmaker' },
-    { name: 'K. Wong', position: 'Winger', stats: '32 Caps', highlight: 'Speedster' },
-    { name: 'J. Lee', position: 'Center', stats: '28 Caps', highlight: 'Defensive Wall' },
-  ];
-
+  // Fetch players from Google Sheets (only those marked as PlayersToWatch)
   useEffect(() => {
+    const loadPlayers = async () => {
+      try {
+        const [playersData, teamsData] = await Promise.all([
+          fetchPlayersToWatch(),
+          fetchTeams()
+        ]);
+        
+        // Merge player data with team info
+        const playersWithTeams = playersData.map(player => {
+          const team = teamsData.find(t => t.teamId === player.teamId);
+          return {
+            ...player,
+            teamLogo: team?.logoUrl || '',
+            teamDivision: team?.division || ''
+          };
+        });
+        
+        setPlayers(playersWithTeams);
+      } catch (error) {
+        console.error('Error loading players:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadPlayers();
+  }, []);
+
+  // GSAP animations
+  useEffect(() => {
+    if (loading || players.length === 0) return;
+    
     const isMobile = window.innerWidth < 768;
     if (isMobile) return;
-    
+
     const ctx = gsap.context(() => {
       const scrollTl = gsap.timeline({
         scrollTrigger: {
@@ -54,11 +81,11 @@ const PlayersToWatch = () => {
           card,
           { x: '60vw', opacity: 0 },
           { x: 0, opacity: 1, ease: 'none' },
-          index * 0.06
+          index * 0.04
         );
       });
 
-      // SETTLE (30-70%): Static
+      // SETTLE (30-70%): Static viewing - no animation
 
       // EXIT (70-100%)
       scrollTl.fromTo(
@@ -71,116 +98,193 @@ const PlayersToWatch = () => {
       cards?.forEach((card, index) => {
         scrollTl.fromTo(
           card,
-          { y: 0, opacity: 1 },
-          { y: '16vh', opacity: 0, ease: 'power2.in', stagger: 0.03 },
-          0.7 + index * 0.03
+          { x: 0, opacity: 1 },
+          { x: '-40vw', opacity: 0, ease: 'power2.in' },
+          0.75 + index * 0.03
         );
       });
-
-      scrollTl.fromTo(
-        '.players-bg',
-        { scale: 1 },
-        { scale: 1.06, ease: 'none' },
-        0.7
-      );
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [loading, players]);
+
+  // Get highlight based on position
+  const getHighlight = (player: PlayerWithTeam): string => {
+    if (player.position?.toLowerCase().includes('captain')) return 'Captain';
+    if (player.number === 1) return 'Playmaker';
+    if (player.position?.toLowerCase().includes('wing')) return 'Speedster';
+    if (player.position?.toLowerCase().includes('center')) return 'Playmaker';
+    return 'Star Player';
+  };
+
+  if (loading) {
+    return (
+      <section className="relative min-h-screen bg-[#0a0a0a] overflow-hidden flex items-center justify-center">
+        <div className="text-white text-xl">Loading Players...</div>
+      </section>
+    );
+  }
+
+  if (players.length === 0) {
+    return (
+      <section className="relative min-h-screen bg-[#0a0a0a] overflow-hidden flex items-center justify-center">
+        <div className="text-white/60 text-xl text-center px-6">
+          <Star className="w-12 h-12 text-[#dc7a5e] mx-auto mb-4" />
+          <p>No players marked as "Players to Watch" yet.</p>
+          <p className="text-sm text-white/40 mt-2">Tick the checkbox in Column I of your PLAYERS tab to feature players here.</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
       ref={sectionRef}
-      id="players"
-      className="relative w-full min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 py-8 md:py-0"
+      className="relative min-h-screen bg-[#0a0a0a] overflow-hidden"
+      style={{ zIndex: 50 }}
     >
-      {/* Background Image */}
-      <div
-        className="players-bg absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: 'url(/pitch_corner.jpg)' }}
-      >
-        <div className="absolute inset-0 bg-[#0B3D2E]/75 md:bg-[#0B3D2E]/70" />
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.3) 1px, transparent 0)`,
+            backgroundSize: '40px 40px',
+          }}
+        />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 w-full max-w-5xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8 lg:gap-12 items-start">
-          {/* Left: Heading */}
-          <div ref={headingRef} className="lg:col-span-4 space-y-2 sm:space-y-4 text-center lg:text-left">
-            <h2
-              className="text-3xl sm:text-4xl lg:text-5xl text-white font-black"
-              style={{ fontFamily: 'League Spartan, sans-serif' }}
-            >
-              PLAYERS
-              <br />
-              <span className="text-[#CFFF2E]">TO WATCH</span>
-            </h2>
-            <p className="text-white/70 text-sm sm:text-base lg:text-lg">
-              Key players representing Hong Kong at the Tag Asia Cup 2026.
-            </p>
-
-            {/* Live Indicator */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-white/10 rounded-full">
-              <Star className="w-3 h-3 sm:w-4 sm:h-4 text-[#CFFF2E]" />
-              <span className="text-white/80 text-xs sm:text-sm">
-                Star Performers
-              </span>
+      <div className="relative w-full min-h-screen flex flex-col lg:flex-row items-center justify-center px-6 lg:px-16 py-20 lg:py-0 gap-8 lg:gap-16">
+        {/* Heading */}
+        <div
+          ref={headingRef}
+          className="lg:w-[35%] text-center lg:text-left flex flex-col items-center lg:items-start"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <Star className="w-8 h-8 text-[#dc7a5e]" />
+            <span className="text-[#dc7a5e] font-mono text-sm tracking-[0.3em] uppercase">
+              Players to Watch
+            </span>
+          </div>
+          <h2 className="font-display text-5xl lg:text-7xl font-bold text-white mb-6">
+            STARS OF
+            <br />
+            <span className="text-[#dc7a5e]">THE GAME</span>
+          </h2>
+          <p className="text-white/60 text-lg max-w-md">
+            Meet the standout players representing their teams at the Tag Asia Cup 2026. 
+            These athletes bring skill, experience, and passion to the pitch.
+          </p>
+          
+          {/* Stats summary */}
+          <div className="mt-8 flex gap-8">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-[#dc7a5e]">{players.length}</div>
+              <div className="text-white/50 text-sm">Featured</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-[#dc7a5e]">
+                {new Set(players.map(p => p.teamName)).size}
+              </div>
+              <div className="text-white/50 text-sm">Teams</div>
             </div>
           </div>
+        </div>
 
-          {/* Right: Players Grid */}
-          <div ref={cardsRef} className="lg:col-span-8">
-            <div className="grid grid-cols-2 gap-2 sm:gap-4">
-              {players.map((player, index) => (
-                <div
-                  key={index}
-                  className="player-card card-white p-3 sm:p-6 lg:p-8"
-                >
-                  <div className="flex items-start justify-between mb-2 sm:mb-4">
-                    <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-[#CFFF2E]/20 flex items-center justify-center">
-                      <Star className="w-4 h-4 sm:w-6 sm:h-6 text-[#0B3D2E]" />
+        {/* Player Cards Grid */}
+        <div
+          ref={cardsRef}
+          className="lg:w-[60%] w-full"
+        >
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {players.map((player, index) => (
+              <div
+                key={player.playerId || index}
+                className="player-card group relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-xl overflow-hidden border border-white/10 hover:border-[#dc7a5e]/50 transition-all duration-300 hover:scale-105"
+              >
+                {/* Player Photo */}
+                <div className="relative aspect-[3/4] overflow-hidden">
+                  {player.photoUrl ? (
+                    <img
+                      src={player.photoUrl}
+                      alt={player.fullName}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      onError={(e) => {
+                        // Fallback if image fails to load
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-[#dc7a5e]/20 to-[#dc7a5e]/5 flex items-center justify-center">
+                      <span className="text-4xl font-bold text-[#dc7a5e]">
+                        {player.fullName?.charAt(0) || '?'}
+                      </span>
                     </div>
-                    <div
-                      className="text-xl sm:text-2xl lg:text-3xl font-black text-[#0B3D2E]"
-                      style={{ fontFamily: 'League Spartan, sans-serif' }}
-                    >
-                      {player.name}
+                  )}
+                  
+                  {/* Overlay gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                  
+                  {/* Highlight badge */}
+                  <div className="absolute top-2 right-2 bg-[#dc7a5e] text-white text-xs px-2 py-1 rounded-full font-medium">
+                    {getHighlight(player)}
+                  </div>
+                  
+                  {/* Team logo (if available) */}
+                  {player.teamLogo && (
+                    <div className="absolute top-2 left-2 w-8 h-8 bg-white/90 rounded-full p-1">
+                      <img
+                        src={player.teamLogo}
+                        alt={player.teamName}
+                        className="w-full h-full object-contain"
+                      />
                     </div>
-                  </div>
-                  <div className="text-[#0B3D2E]/60 text-xs sm:text-sm font-medium mb-1">
-                    {player.position}
-                  </div>
-                  <div className="text-[#CFFF2E] bg-[#0B3D2E] px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold inline-block">
-                    {player.highlight}
-                  </div>
-                  <div className="mt-2 sm:mt-3 text-[#0B3D2E]/80 text-xs sm:text-sm">
-                    {player.stats}
-                  </div>
+                  )}
+                  
+                  {/* Jersey number */}
+                  {player.number > 0 && (
+                    <div className="absolute bottom-2 right-2 bg-black/60 text-white text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center">
+                      {player.number}
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
 
-            {/* Additional Info Row */}
-            <div className="grid grid-cols-3 gap-2 sm:gap-4 mt-2 sm:mt-4">
-              {[
-                { label: 'Total Caps', value: '240+' },
-                { label: 'Avg Age', value: '26' },
-                { label: 'Experience', value: 'High' },
-              ].map((item, index) => (
-                <div
-                  key={index}
-                  className="player-card bg-white/10 backdrop-blur-sm rounded-lg sm:rounded-2xl p-2 sm:p-4 text-center"
-                >
-                  <div
-                    className="text-lg sm:text-2xl font-bold text-[#CFFF2E]"
-                    style={{ fontFamily: 'League Spartan, sans-serif' }}
-                  >
-                    {item.value}
+                {/* Player Info */}
+                <div className="p-3">
+                  <h3 className="text-white font-bold text-sm truncate">
+                    {player.fullName}
+                  </h3>
+                  
+                  {/* Team link */}
+                  <div className="flex items-center gap-1 mt-1 text-white/60 text-xs">
+                    <Shield className="w-3 h-3 text-[#dc7a5e]" />
+                    <span className="truncate">{player.teamName}</span>
                   </div>
-                  <div className="text-white/60 text-[10px] sm:text-xs">{item.label}</div>
+                  
+                  {/* Country */}
+                  {player.country && (
+                    <div className="flex items-center gap-1 mt-1 text-white/40 text-xs">
+                      <Flag className="w-3 h-3" />
+                      <span>{player.country}</span>
+                    </div>
+                  )}
+                  
+                  {/* Position */}
+                  <div className="mt-2">
+                    <span className="text-[#dc7a5e] text-xs font-medium">
+                      {player.position || 'Player'}
+                    </span>
+                  </div>
+                  
+                  {/* Division tag */}
+                  {player.teamDivision && (
+                    <div className="mt-1 text-xs text-white/30 truncate">
+                      {player.teamDivision}
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
