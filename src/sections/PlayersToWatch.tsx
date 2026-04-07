@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Star, Shield } from 'lucide-react';
-import { fetchPlayersToWatch, fetchTeams, type Player, type Team } from '../services/googleSheets';
+import { fetchPlayersToWatch, fetchTeams, type Player } from '../services/googleSheets';
 
 interface PlayerWithTeam extends Player {
   teamLogo?: string;
