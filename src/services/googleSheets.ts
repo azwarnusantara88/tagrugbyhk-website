@@ -23,6 +23,7 @@ const SHEET_GIDS = {
 
 // FIXTURES: Date, Day, Time, Field, HomeTeamID, HomeTeam, HomeScore, AwayTeamID, AwayTeam, AwayScore, Division, Round, Status, Notes
 export interface Fixture {
+  matchId?: string;  // Optional for backwards compatibility
   date: string;
   day: string;
   time: string;
@@ -78,6 +79,7 @@ export interface Player {
 
 // NEWS: ArticleID, Title, Author, Date, Category, Excerpt, Content, FeaturedImage, GalleryImages, Published, Slug, Tags, Views
 export interface NewsItem {
+  id?: string;  // Optional alias for articleId
   articleId: string;
   title: string;
   author: string;
@@ -86,6 +88,7 @@ export interface NewsItem {
   excerpt: string;
   content: string;
   featuredImage: string;
+  imageUrl?: string;  // Optional alias for featuredImage
   galleryImages: string;
   published: boolean;
   slug: string;
@@ -246,6 +249,9 @@ export async function fetchTeamById(teamId: string): Promise<Team | null> {
   return teams.find(t => t.teamId === teamId) || null;
 }
 
+// Alias for backwards compatibility
+export const fetchTeams = getTeams;
+
 // Fetch players data
 // PLAYERS: PlayerID, TeamID, FullName, TeamName, Country, Number, Position, PhotoURL, PlayersToWatch, Tries, Weight, Nationality, Bio, Status, Debut
 export async function getPlayers(): Promise<Player[]> {
@@ -274,6 +280,12 @@ export async function getPlayers(): Promise<Player[]> {
 export async function fetchPlayersByTeam(teamId: string): Promise<Player[]> {
   const players = await getPlayers();
   return players.filter(p => p.teamId === teamId);
+}
+
+// Fetch players marked as "Players to Watch"
+export async function fetchPlayersToWatch(): Promise<Player[]> {
+  const players = await getPlayers();
+  return players.filter(p => p.playersToWatch);
 }
 
 // Fetch ladder/standings data
