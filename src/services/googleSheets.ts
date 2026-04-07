@@ -7,6 +7,7 @@ const SHEET_GIDS = {
   NEWS: '1320981095',
   LADDERS: '397145122',
   CONFIG: '446704132',
+  DATA: '104865886',
 };
 
 export interface Fixture {
@@ -108,6 +109,13 @@ function parseCSV(csvText: string): string[][] {
   });
 }
 
+// Extract image URL from =IMAGE() formula
+function extractImageUrl(formula: string): string {
+  if (!formula) return '';
+  const match = formula.match(/=IMAGE\(["']([^"']+)["']\)/i);
+  return match ? match[1] : formula;
+}
+
 export async function fetchFixtures(): Promise<Fixture[]> {
   const data = await fetchSheetData(SHEET_GIDS.FIXTURES);
   if (data.length < 2) return [];
@@ -135,10 +143,10 @@ export async function fetchTeams(): Promise<Team[]> {
     division: row[2] || '',
     region: row[3] || '',
     captain: row[4] || '',
-    logoUrl: row[5] || '',
-    wins: parseInt(row[6]) || 0,
-    losses: parseInt(row[7]) || 0,
-    points: parseInt(row[8]) || 0,
+    logoUrl: extractImageUrl(row[7] || ''), // ← CHANGED: Column H (index 7) for LOGO
+    wins: parseInt(row[8]) || 0,
+    losses: parseInt(row[9]) || 0,
+    points: parseInt(row[10]) || 0,
   }));
 }
 
@@ -153,7 +161,7 @@ export async function fetchPlayers(): Promise<Player[]> {
     country: row[4] || '',
     number: parseInt(row[5]) || 0,
     position: row[6] || '',
-    photoUrl: row[7] || '',
+    photoUrl: extractImageUrl(row[7] || ''),
     playersToWatch: row[8]?.toLowerCase() === 'true' || row[8] === 'TRUE',
   }));
 }
@@ -171,7 +179,7 @@ export async function fetchNews(): Promise<NewsItem[]> {
     title: row[1] || '',
     date: row[2] || '',
     excerpt: row[3] || '',
-    imageUrl: row[4] || '',
+    imageUrl: extractImageUrl(row[4] || ''),
     content: row[5] || '',
     author: row[6] || '',
   }));
@@ -227,4 +235,11 @@ export async function fetchPlayersByTeam(teamId: string): Promise<Player[]> {
 export async function fetchNewsBySlug(slug: string): Promise<NewsItem | null> {
   const news = await fetchNews();
   return news.find(item => item.slug === slug) || null;
+}
+
+export async function fetchFixturesByTeam(teamId: string): Promise<Fixture[]> {
+  const fixtures = await fetchFixtures();
+  return fixtures.filter(
+    f => f.homeTeam.includes(teamId) || f.awayTeam.includes(teamId)
+  );
 }
