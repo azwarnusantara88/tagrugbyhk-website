@@ -18,21 +18,24 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={
-          <>
-            <Navigation />
-            <HeroSection />
-            <CoverSection />
-            <TeamsSection />
-            <FixturesSection />
-            <PlayersSection />
-            <NewsSection />
-            <TravelSection />
-            <PartnersSection />
-            <FanZone />
-            <ContactFooter />
-          </>
-        } />
+        <Route
+          path="/"
+          element={
+            <>
+              <Navigation />
+              <HeroSection />
+              <CoverSection />
+              <TeamsSection />
+              <FixturesSection />
+              <PlayersSection />
+              <NewsSection />
+              <TravelSection />
+              <PartnersSection />
+              <FanZone />
+              <ContactFooter />
+            </>
+          }
+        />
         <Route path="/team/:teamId" element={<TeamProfile />} />
         <Route path="/news" element={<NewsList />} />
         <Route path="/news/:slug" element={<NewsArticle />} />
