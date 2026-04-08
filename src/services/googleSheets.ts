@@ -11,7 +11,7 @@ const SHEET_GIDS = {
 };
 
 // ============================================
-// INTERFACES - Matching Your Google Sheet Structure
+// INTERFACES - Match Your Google Sheet Exactly
 // ============================================
 
 // FIXTURES: MatchID, Date, Day, Time, Field, HomeTeamID, HomeTeam, HomeScore, AwayTeamID, AwayTeam, AwayScore, Division, Round, Status, Notes
@@ -29,7 +29,7 @@ export interface Fixture {
   awayScore: number;
   division: string;
   round: string;
-  status: string;
+  status: 'SCHEDULED' | 'LIVE' | 'FINAL' | string;
   notes: string;
 }
 
@@ -40,15 +40,10 @@ export interface Team {
   division: string;
   region: string;
   captain: string;
-  coach: string;
   logoUrl: string;
-  shortCode: string;
-  category: string;
-  contact: string;
-  active: boolean;
-  status: string;
-  founded: string;
-  website: string;
+  wins: number;
+  losses: number;
+  points: number;
 }
 
 // PLAYERS: PlayerID, TeamID, FullName, TeamName, Region, Number, Position, PhotoURL, PlayersToWatch, Tries, Weight, Nationality, Bio, Status, Debut
@@ -62,17 +57,12 @@ export interface Player {
   position: string;
   photoUrl: string;
   playersToWatch: boolean;
-  tries: number;
-  weight: string;
-  nationality: string;
-  bio: string;
-  status: string;
-  debut: string;
 }
 
 // NEWS: ArticleID, Title, Author, Date, Category, Excerpt, Content, FeaturedImage, GalleryImages, Published, Slug, Tags, Views
 export interface NewsItem {
   articleId: string;
+  slug: string;
   title: string;
   author: string;
   date: string;
@@ -80,30 +70,26 @@ export interface NewsItem {
   excerpt: string;
   content: string;
   featuredImage: string;
+  imageUrl: string;
   galleryImages: string;
   published: boolean;
-  slug: string;
   tags: string[];
   views: number;
 }
 
 // LADDER: Position, TeamID, TeamName, Division, Played, Won, Drawn, Lost, PointsFor, PointsAgainst, PointsDiff, BonusPoints, TotalPoints, WinPercent, Form
-export interface LadderStanding {
+export interface Standing {
   position: number;
   teamId: string;
   teamName: string;
   division: string;
   played: number;
   won: number;
-  drawn: number;
   lost: number;
   pointsFor: number;
   pointsAgainst: number;
   pointsDiff: number;
-  bonusPoints: number;
   totalPoints: number;
-  winPercent: number;
-  form: string;
 }
 
 // CONFIG: Key, Value
@@ -112,15 +98,6 @@ export interface Config {
   tournamentName: string;
   tournamentDate: string;
   venue: string;
-  websiteUrl?: string;
-  registrationOpen?: string;
-  registrationDeadline?: string;
-  contactEmail?: string;
-  contactPhone?: string;
-  socialInstagram?: string;
-  socialFacebook?: string;
-  socialYouTube?: string;
-  socialTwitter?: string;
 }
 
 // ============================================
@@ -157,53 +134,11 @@ function parseCSV(csvText: string): string[][] {
   });
 }
 
-/**
- * Converts Google Drive sharing links to direct image URLs
- * Handles: https://drive.google.com/file/d/FILE_ID/view?usp=sharing
- * Returns: https://drive.google.com/uc?export=view&id=FILE_ID
- */
-function convertGoogleDriveUrl(url: string): string {
-  if (!url) return '';
-  
-  // If already a direct URL, return as-is
-  if (url.includes('uc?export=view')) {
-    return url;
-  }
-  
-  // Extract file ID from various Google Drive URL formats
-  let fileId = '';
-  
-  // Format: /file/d/FILE_ID/view
-  const fileMatch = url.match(/\/file\/d\/([^\/\?]+)/);
-  if (fileMatch) {
-    fileId = fileMatch[1];
-  }
-  
-  // Format: ?id=FILE_ID or open?id=FILE_ID
-  const idMatch = url.match(/[?&]id=([^&]+)/);
-  if (idMatch && !fileId) {
-    fileId = idMatch[1];
-  }
-  
-  if (fileId) {
-    return `https://drive.google.com/uc?export=view&id=${fileId}`;
-  }
-  
-  return url;
-}
-
-// Extract image URL from =IMAGE() formula
-function extractImageUrl(formula: string): string {
-  if (!formula) return '';
-  const match = formula.match(/=IMAGE\(["']([^"']+)["']\)/i);
-  return match ? match[1] : formula;
-}
-
 // ============================================
-// FETCH FUNCTIONS - Matching Your Column Structure
+// FETCH FUNCTIONS
 // ============================================
 
-// FIXTURES: MatchID(0), Date(1), Day(2), Time(3), Field(4), HomeTeamID(5), HomeTeam(6), HomeScore(7), AwayTeamID(8), AwayTeam(9), AwayScore(10), Division(11), Round(12), Status(13), Notes(14)
+// FIXTURES
 export async function fetchFixtures(): Promise<Fixture[]> {
   const data = await fetchSheetData(SHEET_GIDS.FIXTURES);
   if (data.length < 2) return [];
@@ -221,15 +156,14 @@ export async function fetchFixtures(): Promise<Fixture[]> {
     awayScore: parseInt(row[10]) || 0,
     division: row[11] || '',
     round: row[12] || '',
-    status: row[13] || '',
+    status: (row[13] as 'SCHEDULED' | 'LIVE' | 'FINAL') || 'SCHEDULED',
     notes: row[14] || '',
   }));
 }
 
-// Alias for compatibility
 export const getFixtures = fetchFixtures;
 
-// TEAMS: TeamID(0), TeamName(1), Division(2), Region(3), Captain(4), Coach(5), LogoURL(6), LOGO(7), ShortCode(8), Category(9), Contact(10), Active(11), Status(12), Founded(13), Website(14)
+// TEAMS
 export async function fetchTeams(): Promise<Team[]> {
   const data = await fetchSheetData(SHEET_GIDS.TEAMS);
   if (data.length < 2) return [];
@@ -239,23 +173,16 @@ export async function fetchTeams(): Promise<Team[]> {
     division: row[2] || '',
     region: row[3] || '',
     captain: row[4] || '',
-    coach: row[5] || '',
-    // Column G (index 6) LogoURL - convert Google Drive links
-    logoUrl: convertGoogleDriveUrl(row[6] || ''),
-    shortCode: row[8] || '',
-    category: row[9] || '',
-    contact: row[10] || '',
-    active: row[11]?.toUpperCase() === 'TRUE',
-    status: row[12] || '',
-    founded: row[13] || '',
-    website: row[14] || '',
+    logoUrl: row[6] || '',
+    wins: 0,
+    losses: 0,
+    points: 0,
   }));
 }
 
-// Alias for compatibility
 export const getTeams = fetchTeams;
 
-// PLAYERS: PlayerID(0), TeamID(1), FullName(2), TeamName(3), Region(4), Number(5), Position(6), PhotoURL(7), PlayersToWatch(8), Tries(9), Weight(10), Nationality(11), Bio(12), Status(13), Debut(14)
+// PLAYERS
 export async function fetchPlayers(): Promise<Player[]> {
   const data = await fetchSheetData(SHEET_GIDS.PLAYERS);
   if (data.length < 2) return [];
@@ -267,14 +194,8 @@ export async function fetchPlayers(): Promise<Player[]> {
     region: row[4] || '',
     number: parseInt(row[5]) || 0,
     position: row[6] || '',
-    photoUrl: convertGoogleDriveUrl(row[7] || ''),
+    photoUrl: row[7] || '',
     playersToWatch: row[8]?.toUpperCase() === 'TRUE',
-    tries: parseInt(row[9]) || 0,
-    weight: row[10] || '',
-    nationality: row[11] || '',
-    bio: row[12] || '',
-    status: row[13] || '',
-    debut: row[14] || '',
   }));
 }
 
@@ -283,29 +204,35 @@ export async function fetchPlayersToWatch(): Promise<Player[]> {
   return allPlayers.filter(player => player.playersToWatch);
 }
 
-// NEWS: ArticleID(0), Title(1), Author(2), Date(3), Category(4), Excerpt(5), Content(6), FeaturedImage(7), GalleryImages(8), Published(9), Slug(10), Tags(11), Views(12)
+// NEWS
 export async function fetchNews(): Promise<NewsItem[]> {
   const data = await fetchSheetData(SHEET_GIDS.NEWS);
   if (data.length < 2) return [];
-  return data.slice(1).map(row => ({
-    articleId: row[0] || '',
-    title: row[1] || '',
-    author: row[2] || '',
-    date: row[3] || '',
-    category: row[4] || '',
-    excerpt: row[5] || '',
-    content: row[6] || '',
-    featuredImage: convertGoogleDriveUrl(row[7] || ''),
-    galleryImages: row[8] || '',
-    published: row[9]?.toUpperCase() === 'TRUE',
-    slug: row[10] || '',
-    tags: row[11] ? row[11].split(',').map((t: string) => t.trim()) : [],
-    views: parseInt(row[12]) || 0,
-  }));
+  return data.slice(1).map(row => {
+    const featuredImage = row[7] || '';
+    return {
+      articleId: row[0] || '',
+      slug: row[10] || '',
+      title: row[1] || '',
+      author: row[2] || '',
+      date: row[3] || '',
+      category: row[4] || '',
+      excerpt: row[5] || '',
+      content: row[6] || '',
+      featuredImage: featuredImage,
+      imageUrl: featuredImage,
+      galleryImages: row[8] || '',
+      published: row[9]?.toUpperCase() === 'TRUE',
+      tags: row[11] ? row[11].split(',').map((t: string) => t.trim()) : [],
+      views: parseInt(row[12]) || 0,
+    };
+  });
 }
 
-// LADDER: Position(0), TeamID(1), TeamName(2), Division(3), Played(4), Won(5), Drawn(6), Lost(7), PointsFor(8), PointsAgainst(9), PointsDiff(10), BonusPoints(11), TotalPoints(12), WinPercent(13), Form(14)
-export async function fetchStandings(): Promise<LadderStanding[]> {
+export const getNews = fetchNews;
+
+// LADDER
+export async function fetchStandings(): Promise<Standing[]> {
   const data = await fetchSheetData(SHEET_GIDS.LADDER);
   if (data.length < 2) return [];
   return data.slice(1).map(row => ({
@@ -315,84 +242,37 @@ export async function fetchStandings(): Promise<LadderStanding[]> {
     division: row[3] || '',
     played: parseInt(row[4]) || 0,
     won: parseInt(row[5]) || 0,
-    drawn: parseInt(row[6]) || 0,
     lost: parseInt(row[7]) || 0,
     pointsFor: parseInt(row[8]) || 0,
     pointsAgainst: parseInt(row[9]) || 0,
     pointsDiff: parseInt(row[10]) || 0,
-    bonusPoints: parseInt(row[11]) || 0,
     totalPoints: parseInt(row[12]) || 0,
-    winPercent: parseFloat(row[13]) || 0,
-    form: row[14] || '',
   }));
 }
 
-// Alias for compatibility
 export const getLadder = fetchStandings;
 
-// CONFIG: Key(0), Value(1)
+// CONFIG
 export async function fetchConfig(): Promise<Config> {
   const data = await fetchSheetData(SHEET_GIDS.CONFIG);
   const config: Config = {
     informationPackUrl: '',
     tournamentName: 'Tag Asia Cup 2026',
-    tournamentDate: 'April 11-12, 2026',
-    venue: 'J-Green Sakai, Osaka',
+    tournamentDate: 'April 11-12 2026',
+    venue: 'J-Green Sakai Osaka',
   };
   if (data.length < 2) return config;
-  
   data.slice(1).forEach(row => {
     const key = row[0]?.toLowerCase().replace(/\s/g, '');
-    const value = row[1] || '';
-    
-    switch (key) {
-      case 'informationpackurl':
-      case 'informationpack':
-        config.informationPackUrl = value;
-        break;
-      case 'tournamentname':
-        config.tournamentName = value;
-        break;
-      case 'tournamentdate':
-      case 'eventdate':
-        config.tournamentDate = value;
-        break;
-      case 'venue':
-      case 'location':
-        config.venue = value;
-        break;
-      case 'websiteurl':
-        config.websiteUrl = value;
-        break;
-      case 'registrationopen':
-        config.registrationOpen = value;
-        break;
-      case 'registrationdeadline':
-        config.registrationDeadline = value;
-        break;
-      case 'contactemail':
-        config.contactEmail = value;
-        break;
-      case 'contactphone':
-        config.contactPhone = value;
-        break;
-      case 'socialinstagram':
-        config.socialInstagram = value;
-        break;
-      case 'socialfacebook':
-        config.socialFacebook = value;
-        break;
-      case 'socialyoutube':
-        config.socialYouTube = value;
-        break;
-      case 'socialtwitter':
-        config.socialTwitter = value;
-        break;
-    }
+    if (key === 'informationpackurl' || key === 'informationpack') config.informationPackUrl = row[1] || '';
+    if (key === 'tournamentname') config.tournamentName = row[1] || '';
+    if (key === 'tournamentdate' || key === 'eventdate') config.tournamentDate = row[1] || '';
+    if (key === 'venue' || key === 'location') config.venue = row[1] || '';
   });
-  
   return config;
 }
+
+export const getConfig = fetchConfig;
 
 // ============================================
 // HELPER FUNCTIONS
@@ -420,10 +300,6 @@ export async function fetchFixturesByTeam(teamId: string): Promise<Fixture[]> {
   );
 }
 
-/**
- * Get team logo URL by TeamID
- * Used by FixturesSection to display team logos
- */
 export async function getTeamLogo(teamId: string): Promise<string> {
   if (!teamId) return '';
   const team = await fetchTeamById(teamId);
