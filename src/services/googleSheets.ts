@@ -1,145 +1,127 @@
-import { cache } from 'react';
-
-// Revalidate every 5 minutes
-export const revalidate = 300;
-
 const SHEET_ID = '1AertW5yTqPz0Sbzxe2ODF74CikTY_hQS9KMbQSsWkuM';
 
-// Sheet GIDs - UPDATED WITH CORRECT IDs
 const SHEET_GIDS = {
   FIXTURES: '0',
   TEAMS: '1275974115',
   PLAYERS: '652663105',
   NEWS: '1320981095',
-  LADDER: '397145122',
+  LADDERS: '397145122',
   CONFIG: '446704132',
   DATA: '104865886',
 };
 
-// ============================================
-// TYPES
-// ============================================
-
-// FIXTURES: MatchID, Date, Day, Time, Field, HomeTeamID, HomeTeam, HomeScore, AwayTeamID, AwayTeam, AwayScore, Division, Round, Status, Notes
 export interface Fixture {
   matchId: string;
   date: string;
-  day: string;
   time: string;
   field: string;
+  division: string;
   homeTeamId: string;
   homeTeam: string;
-  homeScore: string;
   awayTeamId: string;
   awayTeam: string;
-  awayScore: string;
-  division: string;
-  round: string;
-  status: string;
-  notes: string;
+  homeScore: number;
+  awayScore: number;
+  status: 'SCHEDULED' | 'LIVE' | 'FINAL';
+  day?: string;
 }
 
-// TEAMS: TeamID, TeamName, Division, Region, Captain, Coach, LogoURL, LOGO, ShortCode, Category, Contact, Active, Status, Founded, Website
 export interface Team {
   teamId: string;
   teamName: string;
   division: string;
   region: string;
   captain: string;
-  coach: string;
   logoUrl: string;
-  shortCode: string;
-  category: string;
-  contact: string;
-  active: boolean;
-  status: string;
-  founded: string;
-  website: string;
+  wins: number;
+  losses: number;
+  points: number;
 }
 
-// PLAYERS: PlayerID, TeamID, FullName, TeamName, Region, Number, Position, PhotoURL, PlayersToWatch, Tries, Weight, Nationality, Bio, Status, Debut
 export interface Player {
   playerId: string;
   teamId: string;
   fullName: string;
   teamName: string;
-  region: string;
+  country: string;
   number: number;
   position: string;
   photoUrl: string;
   playersToWatch: boolean;
-  tries: number;
-  weight: string;
-  nationality: string;
-  bio: string;
-  status: string;
-  debut: string;
 }
 
-// NEWS: ArticleID, Title, Author, Date, Category, Excerpt, Content, FeaturedImage, GalleryImages, Published, Slug, Tags, Views
 export interface NewsItem {
-  articleId: string;
-  title: string;
-  author: string;
-  date: string;
-  category: string;
-  excerpt: string;
-  content: string;
-  featuredImage: string;
-  galleryImages: string;
-  published: boolean;
   slug: string;
-  tags: string[];
-  views: number;
+  title: string;
+  date: string;
+  excerpt: string;
+  imageUrl: string;
+  content: string;
+  author: string;
 }
 
-// LADDER: Position, TeamID, TeamName, Division, Played, Won, Drawn, Lost, PointsFor, PointsAgainst, PointsDiff, BonusPoints, TotalPoints, WinPercent, Form
-export interface LadderStanding {
-  position: number;
+export interface Standing {
   teamId: string;
   teamName: string;
   division: string;
   played: number;
   won: number;
-  drawn: number;
   lost: number;
   pointsFor: number;
   pointsAgainst: number;
   pointsDiff: number;
-  bonusPoints: number;
   totalPoints: number;
-  winPercent: number;
-  form: string;
+  position: number;
 }
 
-// CONFIG: Key, Value
 export interface Config {
-  key: string;
-  value: string;
-  // Additional properties that components expect
-  informationPackUrl?: string;
-  venue?: string;
-  tournamentDate?: string;
-  tournamentName?: string;
-  websiteUrl?: string;
-  location?: string;
-  eventDate?: string;
-  registrationOpen?: string;
-  registrationDeadline?: string;
-  contactEmail?: string;
-  contactPhone?: string;
-  socialInstagram?: string;
-  socialFacebook?: string;
-  socialYouTube?: string;
-  socialTwitter?: string;
+  informationPackUrl: string;
+  tournamentName: string;
+  tournamentDate: string;
+  venue: string;
 }
 
-// ============================================
-// HELPER FUNCTIONS
-// ============================================
+async function fetchSheetData(gid: string): Promise<string[][]> {
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${gid}`;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    return parseCSV(await response.text());
+  } catch (error) {
+    console.error('Error fetching sheet data:', error);
+    return [];
+  }
+}
+
+function parseCSV(csvText: string): string[][] {
+  const lines = csvText.trim().split('\n');
+  return lines.map(line => {
+    const result: string[] = [];
+    let current = '';
+    let inQuotes = false;
+    for (const char of line) {
+      if (char === '"') inQuotes = !inQuotes;
+      else if (char === ',' && !inQuotes) {
+        result.push(current.trim());
+        current = '';
+      } else current += char;
+    }
+    result.push(current.trim());
+    return result;
+  });
+}
+
+// Extract image URL from =IMAGE() formula
+function extractImageUrl(formula: string): string {
+  if (!formula) return '';
+  const match = formula.match(/=IMAGE\(["']([^"']+)["']\)/i);
+  return match ? match[1] : formula;
+}
 
 /**
  * Converts Google Drive sharing links to direct image URLs
+ * Handles: https://drive.google.com/file/d/FILE_ID/view?usp=sharing
+ * Returns: https://drive.google.com/uc?export=view&id=FILE_ID
  */
 function convertGoogleDriveUrl(url: string): string {
   if (!url) return '';
@@ -171,342 +153,149 @@ function convertGoogleDriveUrl(url: string): string {
   return url;
 }
 
-/**
- * Extract image URL from =IMAGE() formula
- */
-function extractImageUrl(formula: string): string {
-  if (!formula) return '';
-  const match = formula.match(/=IMAGE\(["']([^"']+)["']\)/i);
-  return match ? match[1] : formula;
-}
-
-// ============================================
-// CSV PARSING
-// ============================================
-
-const fetchSheetData = cache(async (gid: string) => {
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${gid}`;
-  
-  try {
-    const response = await fetch(url);
-    
-    if (!response.ok) {
-      throw new Error(`Failed to fetch sheet data: ${response.statusText}`);
-    }
-    
-    const csvText = await response.text();
-    return parseCSV(csvText);
-  } catch (error) {
-    console.error('Error fetching sheet data:', error);
-    return [];
-  }
-});
-
-function parseCSV(csvText: string): any[] {
-  const lines = csvText.split('\n').filter(line => line.trim());
-  if (lines.length < 2) return [];
-  
-  const headers = parseCSVLine(lines[0]);
-  
-  return lines.slice(1).map(line => {
-    const values = parseCSVLine(line);
-    const row: any = {};
-    headers.forEach((header, index) => {
-      row[header] = values[index] || '';
-    });
-    return row;
-  });
-}
-
-function parseCSVLine(line: string): string[] {
-  const result: string[] = [];
-  let current = '';
-  let inQuotes = false;
-  
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-    
-    if (char === '"') {
-      if (inQuotes && line[i + 1] === '"') {
-        current += '"';
-        i++;
-      } else {
-        inQuotes = !inQuotes;
-      }
-    } else if (char === ',' && !inQuotes) {
-      result.push(current.trim());
-      current = '';
-    } else {
-      current += char;
-    }
-  }
-  
-  result.push(current.trim());
-  return result;
-}
-
-// ============================================
-// FETCH FUNCTIONS
-// ============================================
-
-// Fetch fixtures data
-export async function getFixtures(): Promise<Fixture[]> {
+export async function fetchFixtures(): Promise<Fixture[]> {
   const data = await fetchSheetData(SHEET_GIDS.FIXTURES);
-  
-  return data.map((row: any) => ({
-    matchId: row.MatchID || '',
-    date: row.Date || '',
-    day: row.Day || '',
-    time: row.Time || '',
-    field: row.Field || '',
-    homeTeamId: row.HomeTeamID || '',
-    homeTeam: row.HomeTeam || '',
-    homeScore: row.HomeScore || '',
-    awayTeamId: row.AwayTeamID || '',
-    awayTeam: row.AwayTeam || '',
-    awayScore: row.AwayScore || '',
-    division: row.Division || '',
-    round: row.Round || '',
-    status: row.Status || '',
-    notes: row.Notes || '',
+  if (data.length < 2) return [];
+  return data.slice(1).map(row => ({
+    matchId: row[0] || '',
+    date: row[1] || '',
+    time: row[3] || '',
+    field: row[4] || '',
+    division: row[11] || '',
+    homeTeamId: row[5] || '',
+    homeTeam: row[6] || '',
+    awayTeamId: row[8] || '',
+    awayTeam: row[9] || '',
+    homeScore: parseInt(row[7]) || 0,
+    awayScore: parseInt(row[10]) || 0,
+    status: (row[13] as 'SCHEDULED' | 'LIVE' | 'FINAL') || 'SCHEDULED',
+    day: row[2] || '',
   }));
 }
 
-export const fetchFixtures = getFixtures;
+// Alias for FixturesSection.tsx compatibility
+export const getFixtures = fetchFixtures;
 
-// Fetch teams data
-export async function getTeams(): Promise<Team[]> {
+export async function fetchTeams(): Promise<Team[]> {
   const data = await fetchSheetData(SHEET_GIDS.TEAMS);
-  
-  return data.map((row: any) => ({
-    teamId: row.TeamID || '',
-    teamName: row.TeamName || '',
-    division: row.Division || '',
-    region: row.Region || '',
-    captain: row.Captain || '',
-    coach: row.Coach || '',
-    logoUrl: convertGoogleDriveUrl(row.LogoURL || ''),
-    shortCode: row.ShortCode || '',
-    category: row.Category || '',
-    contact: row.Contact || '',
-    active: row.Active === 'TRUE' || row.Active === 'true',
-    status: row.Status || '',
-    founded: row.Founded || '',
-    website: row.Website || '',
+  if (data.length < 2) return [];
+  return data.slice(1).map(row => ({
+    teamId: row[0] || '',
+    teamName: row[1] || '',
+    division: row[2] || '',
+    region: row[3] || '',
+    captain: row[4] || '',
+    // Column G (index 6) is LogoURL - convert Google Drive links to direct URLs
+    logoUrl: convertGoogleDriveUrl(row[6] || ''),
+    wins: 0,
+    losses: 0,
+    points: 0,
   }));
 }
 
-export const fetchTeams = getTeams;
+// Alias for FixturesSection.tsx compatibility
+export const getTeams = fetchTeams;
 
-export async function fetchTeamById(teamId: string): Promise<Team | null> {
-  const teams = await getTeams();
-  return teams.find(t => t.teamId === teamId) || null;
-}
-
-// Fetch players data
-export async function getPlayers(): Promise<Player[]> {
+export async function fetchPlayers(): Promise<Player[]> {
   const data = await fetchSheetData(SHEET_GIDS.PLAYERS);
-  
-  return data.map((row: any) => ({
-    playerId: row.PlayerID || '',
-    teamId: row.TeamID || '',
-    fullName: row.FullName || '',
-    teamName: row.TeamName || '',
-    region: row.Region || '',
-    number: parseInt(row.Number) || 0,
-    position: row.Position || '',
-    photoUrl: convertGoogleDriveUrl(row.PhotoURL || ''),
-    playersToWatch: row.PlayersToWatch === 'TRUE' || row.PlayersToWatch === 'true',
-    tries: parseInt(row.Tries) || 0,
-    weight: row.Weight || '',
-    nationality: row.Nationality || '',
-    bio: row.Bio || '',
-    status: row.Status || '',
-    debut: row.Debut || '',
+  if (data.length < 2) return [];
+  return data.slice(1).map(row => ({
+    playerId: row[0] || '',
+    teamId: row[1] || '',
+    fullName: row[2] || '',
+    teamName: row[3] || '',
+    country: row[4] || '',
+    number: parseInt(row[5]) || 0,
+    position: row[6] || '',
+    photoUrl: extractImageUrl(row[7] || ''),
+    playersToWatch: row[8]?.toLowerCase() === 'true' || row[8] === 'TRUE',
   }));
-}
-
-export async function fetchPlayersByTeam(teamId: string): Promise<Player[]> {
-  const players = await getPlayers();
-  return players.filter(p => p.teamId === teamId);
 }
 
 export async function fetchPlayersToWatch(): Promise<Player[]> {
-  const players = await getPlayers();
-  return players.filter(p => p.playersToWatch);
+  const allPlayers = await fetchPlayers();
+  return allPlayers.filter(player => player.playersToWatch);
 }
 
-// Fetch ladder/standings data
-export async function getLadder(): Promise<LadderStanding[]> {
-  const data = await fetchSheetData(SHEET_GIDS.LADDER);
-  
-  return data.map((row: any) => ({
-    position: parseInt(row.Position) || 0,
-    teamId: row.TeamID || '',
-    teamName: row.TeamName || '',
-    division: row.Division || '',
-    played: parseInt(row.Played) || 0,
-    won: parseInt(row.Won) || 0,
-    drawn: parseInt(row.Drawn) || 0,
-    lost: parseInt(row.Lost) || 0,
-    pointsFor: parseInt(row.PointsFor) || 0,
-    pointsAgainst: parseInt(row.PointsAgainst) || 0,
-    pointsDiff: parseInt(row.PointsDiff) || 0,
-    bonusPoints: parseInt(row.BonusPoints) || 0,
-    totalPoints: parseInt(row.TotalPoints) || 0,
-    winPercent: parseFloat(row.WinPercent) || 0,
-    form: row.Form || '',
-  }));
-}
-
-export const getStandings = getLadder;
-
-// Fetch news data
-export async function getNews(): Promise<NewsItem[]> {
+export async function fetchNews(): Promise<NewsItem[]> {
   const data = await fetchSheetData(SHEET_GIDS.NEWS);
-  
-  return data.map((row: any) => ({
-    articleId: row.ArticleID || '',
-    title: row.Title || '',
-    author: row.Author || '',
-    date: row.Date || '',
-    category: row.Category || '',
-    excerpt: row.Excerpt || '',
-    content: row.Content || '',
-    featuredImage: convertGoogleDriveUrl(row.FeaturedImage || ''),
-    galleryImages: row.GalleryImages || '',
-    published: row.Published === 'TRUE' || row.Published === 'true',
-    slug: row.Slug || '',
-    tags: row.Tags ? row.Tags.split(',').map((t: string) => t.trim()) : [],
-    views: parseInt(row.Views) || 0,
+  if (data.length < 2) return [];
+  return data.slice(1).map(row => ({
+    slug: row[0] || '',
+    title: row[1] || '',
+    date: row[2] || '',
+    excerpt: row[3] || '',
+    imageUrl: extractImageUrl(row[4] || ''),
+    content: row[5] || '',
+    author: row[6] || '',
   }));
 }
 
-export const fetchNews = getNews;
-
-export async function fetchNewsBySlug(slug: string): Promise<NewsItem | null> {
-  const news = await getNews();
-  return news.find(n => n.slug === slug) || null;
-}
-
-// ============================================
-// CONFIG FUNCTIONS - FIXED FOR TournamentOverview.tsx
-// ============================================
-
-/**
- * Fetch config as array of key-value pairs
- */
-export async function getConfig(): Promise<Config[]> {
-  const data = await fetchSheetData(SHEET_GIDS.CONFIG);
-  
-  return data.map((row: any) => ({
-    key: row.Key || '',
-    value: row.Value || '',
+export async function fetchStandings(): Promise<Standing[]> {
+  const data = await fetchSheetData(SHEET_GIDS.LADDERS);
+  if (data.length < 2) return [];
+  return data.slice(1).map(row => ({
+    teamId: row[0] || '',
+    teamName: row[1] || '',
+    division: row[2] || '',
+    played: parseInt(row[3]) || 0,
+    won: parseInt(row[4]) || 0,
+    lost: parseInt(row[5]) || 0,
+    pointsFor: parseInt(row[6]) || 0,
+    pointsAgainst: parseInt(row[7]) || 0,
+    pointsDiff: parseInt(row[8]) || 0,
+    totalPoints: parseInt(row[9]) || 0,
+    position: parseInt(row[10]) || 0,
   }));
 }
 
-/**
- * Fetch config as a single Config object
- * This is what TournamentOverview.tsx expects
- */
 export async function fetchConfig(): Promise<Config> {
   const data = await fetchSheetData(SHEET_GIDS.CONFIG);
   const config: Config = {
-    key: 'config',
-    value: 'loaded',
     informationPackUrl: '',
     tournamentName: 'Tag Asia Cup 2026',
     tournamentDate: 'April 11-12, 2026',
-    venue: 'J-Green Sakai City',
-    websiteUrl: '',
-    location: '',
-    eventDate: '',
-    registrationOpen: '',
-    registrationDeadline: '',
-    contactEmail: '',
-    contactPhone: '',
-    socialInstagram: '',
-    socialFacebook: '',
-    socialYouTube: '',
-    socialTwitter: '',
+    venue: 'J-Green Sakai, Osaka',
   };
-  
-  data.forEach((row: any) => {
-    const key = row.Key || '';
-    const value = row.Value || '';
-    
-    // Map common config keys to Config properties
-    switch (key) {
-      case 'TournamentName':
-      case 'tournamentName':
-        config.tournamentName = value;
-        break;
-      case 'EventDate':
-      case 'eventDate':
-      case 'tournamentDate':
-        config.tournamentDate = value;
-        config.eventDate = value;
-        break;
-      case 'Location':
-      case 'location':
-      case 'venue':
-        config.venue = value;
-        config.location = value;
-        break;
-      case 'WebsiteURL':
-      case 'websiteUrl':
-        config.websiteUrl = value;
-        break;
-      case 'InformationPack':
-      case 'informationPackUrl':
-        config.informationPackUrl = value;
-        break;
-      case 'RegistrationOpen':
-      case 'registrationOpen':
-        config.registrationOpen = value;
-        break;
-      case 'RegistrationDeadline':
-      case 'registrationDeadline':
-        config.registrationDeadline = value;
-        break;
-      case 'ContactEmail':
-      case 'contactEmail':
-        config.contactEmail = value;
-        break;
-      case 'ContactPhone':
-      case 'contactPhone':
-        config.contactPhone = value;
-        break;
-      case 'SocialInstagram':
-      case 'socialInstagram':
-        config.socialInstagram = value;
-        break;
-      case 'SocialFacebook':
-      case 'socialFacebook':
-        config.socialFacebook = value;
-        break;
-      case 'SocialYouTube':
-      case 'socialYouTube':
-        config.socialYouTube = value;
-        break;
-      case 'SocialTwitter':
-      case 'socialTwitter':
-        config.socialTwitter = value;
-        break;
-      default:
-        // Store any other keys dynamically
-        (config as any)[key] = value;
-    }
+  if (data.length < 2) return config;
+  data.slice(1).forEach(row => {
+    const key = row[0]?.toLowerCase();
+    if (key === 'informationpackurl') config.informationPackUrl = row[1] || '';
+    if (key === 'tournamentname') config.tournamentName = row[1] || '';
+    if (key === 'tournamentdate') config.tournamentDate = row[1] || '';
+    if (key === 'venue') config.venue = row[1] || '';
   });
-  
   return config;
 }
 
+export async function fetchTeamById(teamId: string): Promise<Team | null> {
+  const teams = await fetchTeams();
+  return teams.find(team => team.teamId === teamId) || null;
+}
+
+export async function fetchPlayersByTeam(teamId: string): Promise<Player[]> {
+  const players = await fetchPlayers();
+  return players.filter(player => player.teamId === teamId);
+}
+
+export async function fetchNewsBySlug(slug: string): Promise<NewsItem | null> {
+  const news = await fetchNews();
+  return news.find(item => item.slug === slug) || null;
+}
+
+export async function fetchFixturesByTeam(teamId: string): Promise<Fixture[]> {
+  const fixtures = await fetchFixtures();
+  return fixtures.filter(
+    f => f.homeTeam.includes(teamId) || f.awayTeam.includes(teamId)
+  );
+}
+
 /**
- * Get a specific config value by key
+ * Helper function to get team logo URL by TeamID
+ * Used by FixturesSection to display team logos
  */
-export async function getConfigValue(key: string): Promise<string> {
-  const config = await getConfig();
-  const item = config.find(c => c.key === key);
-  return item?.value || '';
+export async function getTeamLogo(teamId: string): Promise<string> {
+  if (!teamId) return '';
+  const team = await fetchTeamById(teamId);
+  return team?.logoUrl || '';
 }
