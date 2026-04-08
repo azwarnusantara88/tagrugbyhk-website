@@ -248,7 +248,7 @@ export const fetchFixtures = async (): Promise<Fixture[]> => {
         continue;
       }
       
-      if (inResultsSection && matchId && matchId.startsWith('M')) {
+      if (matchId && matchId.startsWith('M')) {
         const homeScore = row[2] ? Number(row[2]) : 0;
         const awayScore = row[5] ? Number(row[5]) : 0;
         scores.set(matchId, {
