@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link } from 'react-router-dom';
-import { Newspaper, Calendar, ArrowRight, User, RefreshCw } from 'lucide-react';
+import { Newspaper, Calendar, ArrowRight, User } from 'lucide-react';
 import { fetchNews, type NewsArticle } from '../services/googleSheets';
 
 gsap.registerPlugin(ScrollTrigger);

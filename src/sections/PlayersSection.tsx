@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Star, Users, Trophy, ChevronRight } from 'lucide-react';
+import { Star, Users, Trophy } from 'lucide-react';
 import { fetchPlayers, fetchPlayersToWatch, getDivisionStyle, type Player } from '../services/googleSheets';
 
 gsap.registerPlugin(ScrollTrigger);
