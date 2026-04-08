@@ -1,39 +1,43 @@
-import { Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navigation from './sections/Navigation';
 import HeroSection from './sections/HeroSection';
-import TournamentOverview from './sections/TournamentOverview';
+import CoverSection from './sections/CoverSection';
+import TeamsSection from './sections/TeamsSection';
 import FixturesSection from './sections/FixturesSection';
-import PlayersToWatch from './sections/PlayersToWatch';
+import PlayersSection from './sections/PlayersSection';
 import NewsSection from './sections/NewsSection';
+import TravelSection from './sections/TravelSection';
 import PartnersSection from './sections/PartnersSection';
 import FanZone from './sections/FanZone';
-import TravelSection from './sections/TravelSection';
 import ContactFooter from './sections/ContactFooter';
-import TeamProfilePage from './pages/TeamProfile';
-import NewsListPage from './pages/NewsList';
-import NewsArticlePage from './pages/NewsArticle';
+import TeamProfile from './pages/TeamProfile';
+import NewsList from './pages/NewsList';
+import NewsArticle from './pages/NewsArticle';
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={
-        <div className="min-h-screen bg-[#0B3D2E]">
-          <Navigation />
-          <HeroSection />
-          <TournamentOverview />
-          <FixturesSection />
-          <PlayersToWatch />
-          <NewsSection />
-          <PartnersSection />
-          <FanZone />
-          <TravelSection />
-          <ContactFooter />
-        </div>
-      } />
-      <Route path="/team/:teamId" element={<TeamProfilePage />} />
-      <Route path="/news" element={<NewsListPage />} />
-      <Route path="/news/:slug" element={<NewsArticlePage />} />
-    </Routes>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={
+          <>
+            <Navigation />
+            <HeroSection />
+            <CoverSection />
+            <TeamsSection />
+            <FixturesSection />
+            <PlayersSection />
+            <NewsSection />
+            <TravelSection />
+            <PartnersSection />
+            <FanZone />
+            <ContactFooter />
+          </>
+        } />
+        <Route path="/team/:teamId" element={<TeamProfile />} />
+        <Route path="/news" element={<NewsList />} />
+        <Route path="/news/:slug" element={<NewsArticle />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
