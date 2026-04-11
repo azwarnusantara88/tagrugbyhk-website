@@ -14,6 +14,10 @@ const SHEET_GIDS = {
   DASHBOARD: '755669495',
 };
 
+// Cache for sheet data
+const CACHE: Record<string, { data: any; timestamp: number }> = {};
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
 export interface Config {
   tournamentName: string;
   eventDate: string;
@@ -100,8 +104,6 @@ export interface NewsArticle {
   views: number;
 }
 
-export type NewsItem = NewsArticle;
-
 export interface Standing {
   position: number;
   teamId: string;
@@ -120,149 +122,118 @@ export interface Standing {
   form: string;
 }
 
-export interface DivisionStyle {
-  bgClass: string;
-  textClass: string;
-  color: string;
-}
-
-export const divisionColors: Record<string, DivisionStyle> = {
-  'Mixed Open': { bgClass: 'bg-[#CFFF2E]', textClass: 'text-[#0B3D2E]', color: '#CFFF2E' },
-  'Mens Open': { bgClass: 'bg-[#0B3D2E]', textClass: 'text-white', color: '#0B3D2E' },
-  'Womens Open': { bgClass: 'bg-[#FF6B6B]', textClass: 'text-white', color: '#FF6B6B' },
-  'Senior Mens': { bgClass: 'bg-[#4ECDC4]', textClass: 'text-white', color: '#4ECDC4' },
-  'TBD': { bgClass: 'bg-gray-500', textClass: 'text-white', color: '#999999' },
-};
-
-export const getDivisionStyle = (divisionName: string): DivisionStyle => {
-  const normalized = divisionName?.trim() || 'TBD';
-  return divisionColors[normalized] || divisionColors['TBD'];
-};
-
-const parseCSV = (csvText: string): string[][] => {
-  const rows: string[][] = [];
-  const lines = csvText.split('\n');
-
-  for (const line of lines) {
-    if (!line.trim()) continue;
-
-    const cells: string[] = [];
-    let cell = '';
-    let inQuotes = false;
-
-    for (let i = 0; i < line.length; i++) {
-      const char = line[i];
-
-      if (char === '"') {
-        inQuotes = !inQuotes;
-      } else if (char === ',' && !inQuotes) {
-        cells.push(cell.trim());
-        cell = '';
+// Parse CSV line with proper quote handling
+const parseCSVLine = (line: string): string[] => {
+  const cells: string[] = [];
+  let cell = '';
+  let inQuotes = false;
+  
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    const nextChar = line[i + 1];
+    
+    if (char === '"') {
+      if (inQuotes && nextChar === '"') {
+        // Escaped quote
+        cell += '"';
+        i++; // Skip next quote
       } else {
-        cell += char;
+        inQuotes = !inQuotes;
       }
+    } else if (char === ',' && !inQuotes) {
+      cells.push(cell.trim());
+      cell = '';
+    } else {
+      cell += char;
     }
-    cells.push(cell.trim());
-    rows.push(cells);
   }
-
-  return rows;
+  cells.push(cell.trim());
+  return cells;
 };
 
 const fetchSheetFromBrowser = async (gid: string): Promise<string[][]> => {
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/pub?gid=${gid}&single=true&output=csv`;
-
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+  const cacheKey = gid;
+  const now = Date.now();
+  
+  // Check cache first
+  if (CACHE[cacheKey] && now - CACHE[cacheKey].timestamp < CACHE_DURATION) {
+    console.log('Using cached data for gid:', gid);
+    return CACHE[cacheKey].data;
   }
 
-  const csvText = await response.text();
-  return parseCSV(csvText);
+  try {
+    // Use Google Sheets CSV export (no API key needed!)
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${gid}`;
+    
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Failed to fetch: ${response.status}`);
+    
+    const csvText = await response.text();
+    
+    // Parse CSV
+    const rows: string[][] = csvText
+      .split('\n')
+      .filter(line => line.trim())
+      .map(parseCSVLine);
+    
+    // Cache the result
+    CACHE[cacheKey] = { data: rows, timestamp: now };
+    console.log('Fetched and cached', rows.length, 'rows for gid:', gid);
+    
+    return rows;
+  } catch (error) {
+    console.error('Error fetching sheet:', error);
+    // Return cached data if available, even if expired
+    if (CACHE[cacheKey]) {
+      console.log('Using expired cache for gid:', gid);
+      return CACHE[cacheKey].data;
+    }
+    throw error;
+  }
 };
 
 export const fetchConfig = async (): Promise<Config> => {
   try {
     const rows = await fetchSheetFromBrowser(SHEET_GIDS.CONFIG);
+    console.log('Fetched config from Google Sheets:', rows.length, 'rows');
 
-    const config: Config = {
-      tournamentName: 'Tag Asia Cup 2026',
-      eventDate: 'April 11-12, 2026',
-      location: 'J-Green Sakai, Osaka',
-      websiteUrl: 'https://tagrugbyhk.org',
-      informationPack: '',
-      registrationOpen: true,
-      registrationDeadline: '',
-      contactEmail: '',
-      contactPhone: '',
-      socialInstagram: '',
-      socialFacebook: '',
-      socialYouTube: '',
-      socialTwitter: '',
-    };
+    const config: Record<string, string> = {};
 
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
-      if (row.length < 2) continue;
-
-      const key = row[0]?.trim();
-      const value = row[1]?.trim();
-
-      if (!key || !value) continue;
-
-      switch (key) {
-        case 'TournamentName':
-          config.tournamentName = value;
-          break;
-        case 'EventDate':
-          config.eventDate = value;
-          break;
-        case 'Location':
-          config.location = value;
-          break;
-        case 'WebsiteURL':
-          config.websiteUrl = value;
-          break;
-        case 'InformationPack':
-          config.informationPack = value;
-          break;
-        case 'RegistrationOpen':
-          config.registrationOpen = value.toUpperCase() === 'TRUE';
-          break;
-        case 'RegistrationDeadline':
-          config.registrationDeadline = value;
-          break;
-        case 'ContactEmail':
-          config.contactEmail = value;
-          break;
-        case 'ContactPhone':
-          config.contactPhone = value;
-          break;
-        case 'SocialInstagram':
-          config.socialInstagram = value;
-          break;
-        case 'SocialFacebook':
-          config.socialFacebook = value;
-          break;
-        case 'SocialYouTube':
-          config.socialYouTube = value;
-          break;
-        case 'SocialTwitter':
-          config.socialTwitter = value;
-          break;
+      if (row.length >= 2) {
+        const key = row[0]?.trim();
+        const value = row[1]?.trim();
+        if (key) {
+          config[key] = value;
+        }
       }
     }
 
-    return config;
-  } catch (err) {
-    console.warn('Failed to fetch config, using defaults:', err);
     return {
-      tournamentName: 'Tag Asia Cup 2026',
-      eventDate: 'April 11-12, 2026',
-      location: 'J-Green Sakai, Osaka',
+      tournamentName: config['TournamentName'] || 'TAG Asia Cup 2026',
+      eventDate: config['EventDate'] || 'November 15-16, 2026',
+      location: config['Location'] || 'Hong Kong',
+      websiteUrl: config['WebsiteUrl'] || 'https://tagrugbyhk.org',
+      informationPack: config['InformationPack'] || '',
+      registrationOpen: config['RegistrationOpen']?.toUpperCase() === 'TRUE',
+      registrationDeadline: config['RegistrationDeadline'] || '',
+      contactEmail: config['ContactEmail'] || '',
+      contactPhone: config['ContactPhone'] || '',
+      socialInstagram: config['SocialInstagram'] || '',
+      socialFacebook: config['SocialFacebook'] || '',
+      socialYouTube: config['SocialYouTube'] || '',
+      socialTwitter: config['SocialTwitter'] || '',
+    };
+  } catch (err) {
+    console.warn('Failed to fetch config from Google Sheets:', err);
+    return {
+      tournamentName: 'TAG Asia Cup 2026',
+      eventDate: 'November 15-16, 2026',
+      location: 'Hong Kong',
       websiteUrl: 'https://tagrugbyhk.org',
       informationPack: '',
-      registrationOpen: true,
+      registrationOpen: false,
       registrationDeadline: '',
       contactEmail: '',
       contactPhone: '',
@@ -283,7 +254,7 @@ export const fetchTeams = async (): Promise<Team[]> => {
 
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
-      if (row.length < 3) continue;
+      if (row.length < 5) continue;
 
       const teamId = row[0]?.trim();
       if (!teamId) continue;
