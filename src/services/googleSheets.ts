@@ -496,3 +496,24 @@ export { fetchFixtures as getFixtures };
 export { fetchTeams as getTeams };
 export { fetchNews as getNews };
 export { fetchConfig as getConfig };
+
+// Division styling helper
+export const getDivisionStyle = (division: string): { bg: string; text: string; border: string } => {
+  const divisionLower = division?.toLowerCase() || '';
+  
+  if (divisionLower.includes('men') && divisionLower.includes('open')) {
+    return { bg: 'bg-blue-500/20', text: 'text-blue-400', border: 'border-blue-500/30' };
+  }
+  if (divisionLower.includes('women') && divisionLower.includes('open')) {
+    return { bg: 'bg-pink-500/20', text: 'text-pink-400', border: 'border-pink-500/30' };
+  }
+  if (divisionLower.includes('mixed')) {
+    return { bg: 'bg-purple-500/20', text: 'text-purple-400', border: 'border-purple-500/30' };
+  }
+  if (divisionLower.includes('senior')) {
+    return { bg: 'bg-amber-500/20', text: 'text-amber-400', border: 'border-amber-500/30' };
+  }
+  
+  // Default style
+  return { bg: 'bg-gray-500/20', text: 'text-gray-400', border: 'border-gray-500/30' };
+};
