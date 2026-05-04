@@ -1,0 +1,2301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hong Kong Tag Rugby (HKTR) — Asia's Tag Rugby Powerhouse</title>
+  <meta name="description" content="Hong Kong Tag Rugby (HKTR) — Building Asia's tag rugby powerhouse. Join our community of players across Men's, Women's, Mixed, and Youth divisions.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* ==========================================
+       CSS RESET & BASE
+    ========================================== */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #E91E63;
+      --secondary: #1A1A1A;
+      --white: #FFFFFF;
+      --light-grey: #F5F5F5;
+      --font-heading: 'Montserrat', sans-serif;
+      --font-body: 'Inter', sans-serif;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-body);
+      color: var(--secondary);
+      background: var(--white);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    img, iframe {
+      display: block;
+      max-width: 100%;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    ul {
+      list-style: none;
+    }
+
+    /* ==========================================
+       ANIMATIONS
+    ========================================== */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-section {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+
+    .animate-section.animate-in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .animate-section.animate-in .animate-child:nth-child(1) { transition-delay: 0.0s; }
+    .animate-section.animate-in .animate-child:nth-child(2) { transition-delay: 0.1s; }
+    .animate-section.animate-in .animate-child:nth-child(3) { transition-delay: 0.2s; }
+    .animate-section.animate-in .animate-child:nth-child(4) { transition-delay: 0.3s; }
+    .animate-section.animate-in .animate-child:nth-child(5) { transition-delay: 0.4s; }
+    .animate-section.animate-in .animate-child:nth-child(6) { transition-delay: 0.5s; }
+
+    .animate-child {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+
+    .animate-section.animate-in .animate-child {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ==========================================
+       PREFERS REDUCED MOTION
+    ========================================== */
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+      .animate-section,
+      .animate-child {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+      }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ==========================================
+       BAUHINIA FLOWER SVG (DECORATIVE)
+    ========================================== */
+    .bauhinia {
+      position: absolute;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .bauhinia svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ==========================================
+       NAVIGATION
+    ========================================== */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: var(--white);
+      z-index: 1000;
+      transition: box-shadow 0.3s ease;
+      padding: 0 40px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .navbar.scrolled {
+      box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 24px;
+      color: var(--secondary);
+      letter-spacing: -0.02em;
+    }
+
+    .nav-logo svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      font-family: var(--font-body);
+      font-weight: 500;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--secondary);
+      transition: color 0.3s ease;
+      position: relative;
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus {
+      color: var(--primary);
+      outline: none;
+    }
+
+    .nav-links a:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 4px;
+      border-radius: 2px;
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      padding: 8px;
+      z-index: 1002;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--secondary);
+      transition: 0.3s ease;
+    }
+
+    /* Mobile Drawer */
+    .mobile-drawer {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 100%;
+      max-width: 400px;
+      height: 100vh;
+      background: var(--secondary);
+      z-index: 1001;
+      transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 80px 40px 40px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .mobile-drawer.open {
+      right: 0;
+    }
+
+    .mobile-drawer .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: none;
+      color: var(--white);
+      font-size: 32px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 8px;
+      font-family: var(--font-heading);
+      font-weight: 300;
+    }
+
+    .mobile-drawer a {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 28px;
+      color: var(--white);
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      transition: color 0.3s ease;
+    }
+
+    .mobile-drawer a:hover,
+    .mobile-drawer a:focus {
+      color: var(--primary);
+      outline: none;
+    }
+
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .drawer-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* ==========================================
+       HERO SECTION
+    ========================================== */
+    .hero {
+      background: var(--secondary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 100px 20px 60px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Hero Logo */
+    .hero-logo-wrap {
+      text-align: center;
+      margin-bottom: 16px;
+      z-index: 1;
+    }
+    .hero-logo-img {
+      height: auto;
+      width: 180px;
+      max-width: 55vw;
+      display: inline-block;
+      filter: drop-shadow(0 4px 16px rgba(0,0,0,0.3));
+    }
+
+    .hero-headline {
+      font-family: var(--font-heading);
+      font-weight: 900;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      color: var(--white);
+      text-align: center;
+      margin-bottom: 0.5em;
+      line-height: 1.1;
+      z-index: 1;
+    }
+
+    .hero-video-wrap {
+      width: 100%;
+      min-height: 500px;
+      position: relative;
+      margin-bottom: 1.5em;
+      overflow: hidden;
+      border-radius: 16px;
+    }
+
+    .hero-video-wrap iframe {
+      width: 100%;
+      height: 100%;
+      min-height: 500px;
+      border: none;
+      border-radius: 16px;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.4);
+      aspect-ratio: 9 / 16;
+    }
+
+    .hero-subheadline {
+      font-family: var(--font-body);
+      font-weight: 400;
+      font-size: 1.125rem;
+      color: rgba(255,255,255,0.8);
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto 2em;
+      line-height: 1.6;
+      z-index: 1;
+    }
+
+    .hero-cta-wrap {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      z-index: 1;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      background: var(--primary);
+      color: var(--white);
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 16px 40px;
+      border-radius: 50px;
+      transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+      border: 2px solid var(--primary);
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus {
+      background: var(--white);
+      color: var(--primary);
+      transform: scale(1.05);
+      outline: none;
+    }
+
+    .btn-secondary {
+      display: inline-block;
+      background: transparent;
+      color: var(--white);
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 16px 40px;
+      border-radius: 50px;
+      border: 2px solid rgba(255,255,255,0.3);
+      transition: border-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+    }
+
+    .btn-secondary:hover,
+    .btn-secondary:focus {
+      border-color: var(--primary);
+      color: var(--primary);
+      outline: none;
+    }
+
+    /* ==========================================
+       ABOUT SECTION
+    ========================================== */
+    .about {
+      background: var(--white);
+      padding: 100px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .about-watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 400px;
+      height: 400px;
+      opacity: 0.05;
+      pointer-events: none;
+    }
+
+    .section-label {
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+
+    .section-heading {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: clamp(2rem, 4vw, 3rem);
+      color: var(--secondary);
+      margin-bottom: 40px;
+      line-height: 1.2;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .about-grid p {
+      font-family: var(--font-body);
+      font-weight: 400;
+      font-size: 16px;
+      line-height: 1.7;
+      color: #444;
+    }
+
+    /* ==========================================
+       PROGRAMS SECTION
+    ========================================== */
+    .programs {
+      background: var(--light-grey);
+      padding: 100px 20px;
+    }
+
+    .programs-header {
+      max-width: 1100px;
+      margin: 0 auto 48px;
+    }
+
+    .programs-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .program-card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 40px 32px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .program-card:nth-child(odd) { border-top: 4px solid var(--primary); }
+    .program-card:nth-child(even) { border-top: 4px solid var(--secondary); }
+
+    .program-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 40px rgba(233,30,99,0.12);
+    }
+
+    .program-card svg {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 20px;
+    }
+
+    .program-card:nth-child(odd) svg { color: var(--primary); }
+    .program-card:nth-child(even) svg { color: var(--secondary); }
+
+    .program-card h3 {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 20px;
+      color: var(--secondary);
+      margin-bottom: 12px;
+    }
+
+    .program-card p {
+      font-family: var(--font-body);
+      font-weight: 400;
+      font-size: 14px;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    /* ==========================================
+       VIDEO / ACTION SECTION
+    ========================================== */
+    /* ==========================================
+       VIDEO / ACTION SECTION (FULL-SCREEN)
+    ========================================== */
+    .video-section {
+      background: var(--secondary);
+      padding: 80px 20px 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .video-section-label {
+      margin-bottom: 12px;
+    }
+
+    .video-section-label .section-label {
+      color: var(--primary);
+    }
+
+    .video-section-heading {
+      margin-bottom: 40px;
+    }
+
+    .video-section-heading h2 {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      color: var(--white);
+      line-height: 1.2;
+    }
+
+    .video-fullscreen-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto 32px;
+      overflow: hidden;
+      border-radius: 16px;
+      aspect-ratio: 16 / 9;
+    }
+
+    .video-fullscreen-wrap iframe {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      height: 178%;
+      border: none;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 12px 48px rgba(0,0,0,0.4);
+    }
+
+    .video-section-desc {
+      font-family: var(--font-body);
+      font-weight: 400;
+      font-size: 16px;
+      color: rgba(255,255,255,0.8);
+      line-height: 1.7;
+      max-width: 600px;
+      margin: 0 auto 24px;
+    }
+
+    .video-section-cta {
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--primary);
+      transition: opacity 0.3s ease;
+    }
+
+    .video-section-cta:hover {
+      opacity: 0.8;
+    }
+
+    /* ==========================================
+       ASIA CUP TEASER SECTION
+    ========================================== */
+    .asiacup {
+      background: var(--white);
+      padding: 100px 20px;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .asiacup-bg-year {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: var(--font-heading);
+      font-weight: 900;
+      font-size: 200px;
+      color: rgba(233,30,99,0.05);
+      line-height: 1;
+      z-index: 0;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .asiacup-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .asiacup h2 {
+      font-family: var(--font-heading);
+      font-weight: 900;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      color: var(--secondary);
+      margin-bottom: 16px;
+      line-height: 1.1;
+    }
+
+    .asiacup-sub {
+      font-family: var(--font-body);
+      font-weight: 400;
+      font-size: 18px;
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    .asiacup p {
+      font-family: var(--font-body);
+      font-weight: 400;
+      font-size: 16px;
+      color: #444;
+      line-height: 1.7;
+    }
+
+    /* Asia Cup Badge */
+    .asiacup-badge {
+      display: inline-block;
+      background: rgba(233,30,99,0.1);
+      border: 1px solid rgba(233,30,99,0.2);
+      border-radius: 50px;
+      padding: 8px 24px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 24px;
+    }
+
+    /* Gallery Section */
+    .gallery-wrap {
+      margin-top: 48px;
+      padding-top: 40px;
+      border-top: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .gallery-heading {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 20px;
+      color: var(--secondary);
+      margin-bottom: 24px;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .gallery-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: var(--white);
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 16px;
+      padding: 16px 16px 20px;
+      text-decoration: none;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .gallery-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 32px rgba(233,30,99,0.15);
+      border-color: rgba(233,30,99,0.2);
+    }
+
+    .gallery-thumb {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .gallery-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+
+    .gallery-card:hover .gallery-thumb img {
+      transform: scale(1.08);
+    }
+
+    .gallery-title {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--secondary);
+      margin-bottom: 6px;
+    }
+
+    .gallery-arrow {
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--primary);
+      transition: color 0.3s ease;
+    }
+
+    .gallery-card:hover .gallery-arrow {
+      color: var(--secondary);
+    }
+
+    /* ==========================================
+       LIGHTBOX SLIDESHOW
+    ========================================== */
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.95);
+      z-index: 2000;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px 100px;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      width: 48px;
+      height: 48px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 50%;
+      color: #fff;
+      font-size: 28px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s ease;
+      z-index: 10;
+    }
+
+    .lightbox-close:hover {
+      background: var(--primary);
+    }
+
+    .lightbox-prev,
+    .lightbox-next {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 56px;
+      height: 56px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 50%;
+      color: #fff;
+      font-size: 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s ease;
+      z-index: 10;
+    }
+
+    .lightbox-prev { left: 20px; }
+    .lightbox-next { right: 20px; }
+
+    .lightbox-prev:hover,
+    .lightbox-next:hover {
+      background: var(--primary);
+    }
+
+    .lightbox-stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      max-width: 1000px;
+      position: relative;
+    }
+
+    .lightbox-stage img {
+      max-width: 100%;
+      max-height: calc(100vh - 220px);
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    }
+
+    .lightbox-counter {
+      position: absolute;
+      top: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.7);
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .lightbox-thumbs {
+      display: flex;
+      gap: 10px;
+      padding: 16px 0;
+      overflow-x: auto;
+      max-width: 100%;
+    }
+
+    .lightbox-thumb {
+      width: 80px;
+      height: 60px;
+      border: 2px solid transparent;
+      border-radius: 6px;
+      overflow: hidden;
+      cursor: pointer;
+      opacity: 0.5;
+      transition: opacity 0.3s ease, border-color 0.3s ease;
+      background: none;
+      padding: 0;
+      flex-shrink: 0;
+    }
+
+    .lightbox-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .lightbox-thumb.active {
+      border-color: var(--primary);
+      opacity: 1;
+    }
+
+    .lightbox-thumb:hover {
+      opacity: 1;
+    }
+
+    /* Gallery card as button — remove default button styles */
+    .gallery-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: var(--white);
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 16px;
+      padding: 16px 16px 20px;
+      text-decoration: none;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: inherit;
+      color: inherit;
+      width: 100%;
+    }
+
+    .gallery-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 32px rgba(233,30,99,0.15);
+      border-color: rgba(233,30,99,0.2);
+    }
+
+    /* ==========================================
+       CONTACT SECTION
+    ========================================== */
+    .contact {
+      background: var(--primary);
+      padding: 100px 20px;
+      text-align: center;
+    }
+
+    .contact h2 {
+      font-family: var(--font-heading);
+      font-weight: 900;
+      font-size: clamp(2rem, 4vw, 3rem);
+      color: var(--white);
+      margin-bottom: 12px;
+    }
+
+    .contact-sub {
+      font-family: var(--font-body);
+      font-weight: 400;
+      font-size: 16px;
+      color: rgba(255,255,255,0.9);
+      margin-bottom: 48px;
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      max-width: 900px;
+      margin: 0 auto 48px;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: var(--white);
+      font-family: var(--font-body);
+      font-weight: 500;
+      font-size: 16px;
+      transition: opacity 0.3s ease;
+    }
+
+    .contact-item svg {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .contact-item:hover {
+      opacity: 0.85;
+    }
+
+    .contact .btn-primary {
+      background: var(--white);
+      color: var(--primary);
+      border-color: var(--white);
+    }
+
+    .contact .btn-primary:hover {
+      background: var(--secondary);
+      color: var(--white);
+      border-color: var(--secondary);
+    }
+
+    /* ==========================================
+       FOOTER
+    ========================================== */
+    .footer {
+      background: var(--secondary);
+      padding: 60px 40px 40px;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .footer-signature {
+      font-family: var(--font-body);
+      font-weight: 400;
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+      line-height: 2;
+    }
+
+    .footer-signature .sig-name {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--white);
+    }
+
+    .footer-signature .sig-org {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--primary);
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.1);
+      margin-top: 40px;
+      padding-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .footer-bottom p {
+      font-family: var(--font-body);
+      font-weight: 400;
+      font-size: 12px;
+      color: rgba(255,255,255,0.4);
+    }
+
+    /* ==========================================
+       CONTAINER HELPER
+    ========================================== */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* ==========================================
+       RESPONSIVE: TABLET (768px - 1024px)
+    ========================================== */
+    @media (max-width: 1024px) {
+      .programs-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* ==========================================
+       RESPONSIVE: MOBILE (< 768px)
+    ========================================== */
+    @media (max-width: 767px) {
+      .navbar {
+        padding: 0 20px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .hamburger {
+        display: flex;
+      }
+
+      .hero {
+        padding: 100px 16px 40px;
+        min-height: auto;
+      }
+
+      .hero-video-wrap {
+        min-height: 300px;
+      }
+
+      .hero-video-wrap iframe {
+        min-height: 300px;
+      }
+
+      .hero-logo-img {
+        width: 130px;
+        max-width: 50vw;
+      }
+
+      .hero-headline {
+        font-size: clamp(2rem, 8vw, 2.5rem);
+      }
+
+      .hero-cta-wrap {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+      }
+
+      .btn-primary, .btn-secondary {
+        width: 100%;
+        max-width: 300px;
+        text-align: center;
+      }
+
+      .about {
+        padding: 60px 16px;
+      }
+
+      .about-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+
+      .programs {
+        padding: 60px 16px;
+      }
+
+      .programs-grid {
+        grid-template-columns: 1fr;
+      }
+      .card-img-wrap {
+        height: 200px;
+      }
+
+    /* ==========================================
+       VIDEO CAROUSEL
+    ========================================== */
+    .highlights-carousel-section {
+      background: var(--secondary);
+      padding: 80px 0;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .highlights-carousel-section .section-label {
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .video-carousel {
+      display: flex;
+      gap: 24px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      padding: 0 10vw;
+      scrollbar-width: none;
+      position: relative;
+    }
+
+    .video-carousel::-webkit-scrollbar {
+      display: none;
+    }
+
+    .video-slide {
+      flex: 0 0 80vw;
+      max-width: 800px;
+      scroll-snap-align: center;
+      opacity: 0.4;
+      transform: scale(0.92);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .video-slide.active {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .video-slide-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      max-height: 65vh;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .video-slide-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 16px;
+    }
+
+    .video-slide-caption {
+      text-align: center;
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 18px;
+      color: rgba(255,255,255,0.8);
+      margin-top: 16px;
+    }
+
+    .carousel-dots {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .carousel-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.3);
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      padding: 0;
+    }
+
+    .carousel-dot.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      width: 28px;
+      border-radius: 10px;
+    }
+
+    .carousel-arrows {
+      display: flex;
+      justify-content: space-between;
+      position: absolute;
+      top: 55%;
+      left: 0;
+      right: 0;
+      padding: 0 16px;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .carousel-arrow {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(233,30,99,0.8);
+      border: none;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    .carousel-arrow:hover {
+      background: var(--primary);
+      transform: scale(1.1);
+    }
+
+    .carousel-mute {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      z-index: 5;
+    }
+
+      .video-section {
+        padding: 60px 16px;
+      }
+
+      .video-slide {
+        flex: 0 0 90vw;
+      }
+
+      .video-slide-wrap {
+        max-height: 55vh;
+      }
+
+      .carousel-arrow {
+        width: 40px;
+        height: 40px;
+        font-size: 14px;
+      }
+
+      .carousel-arrows {
+        padding: 0 8px;
+      }
+
+      .video-section-heading h2 {
+        font-size: clamp(1.6rem, 6vw, 2rem);
+      }
+
+      .video-fullscreen-wrap {
+        width: 100%;
+      }
+
+      .video-fullscreen-wrap {
+        aspect-ratio: 9 / 16;
+        max-height: 70vh;
+      }
+      .video-fullscreen-wrap iframe {
+        width: 178%;
+        height: 100%;
+        border-radius: 12px;
+      }
+
+      .asiacup {
+        padding: 60px 16px;
+      }
+
+      .asiacup-bg-year {
+        font-size: 120px;
+      }
+
+      .contact {
+        padding: 60px 16px;
+      }
+
+      .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .footer {
+        padding: 40px 20px 30px;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    /* ==========================================
+       YOUTUBE EMBED UTILITY
+    ========================================== */
+    .youtube-embed {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    }
+
+    /* ==========================================
+       FOCUS STATES (ACCESSIBILITY)
+    ========================================== */
+    a:focus-visible,
+    button:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 3px;
+    }
+
+    /* Skip link */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--primary);
+      color: var(--white);
+      padding: 8px 16px;
+      font-family: var(--font-body);
+      font-weight: 500;
+      font-size: 14px;
+      z-index: 9999;
+      transition: top 0.3s;
+    }
+
+    .skip-link:focus {
+      top: 0;
+    }
+    /* MUTE BUTTON */
+    .mute-btn {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 50px;
+      padding: 8px 16px;
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease, border-color 0.3s ease;
+      z-index: 100;  /* mute btn on top */
+    }
+    .mute-btn:hover {
+      background: rgba(233,30,99,0.85);
+      border-color: rgba(255,255,255,0.4);
+      transform: scale(1.05);
+    }
+    .mute-btn:active {
+      transform: scale(0.98);
+    }
+    .mute-btn svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+    .mute-btn span {
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Skip to content link for accessibility -->
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <!-- ==================== NAVIGATION ==================== -->
+  <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+    <a href="#" class="nav-logo" aria-label="HKTR Home">
+      <img src="HKTR_LOGO.png" alt="HKTR" style="height:40px; width:auto; display:block;">
+    </a>
+
+    <div class="nav-links" id="navLinks">
+      <a href="#home">Home</a>
+      <a href="#about">About</a>
+      <a href="#programs">Training</a>
+      <a href="#video-section">Events</a>
+      <a href="#contact">Contact</a>
+    </div>
+
+    <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileDrawer">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </nav>
+
+  <!-- Mobile Drawer Overlay -->
+  <div class="drawer-overlay" id="drawerOverlay" aria-hidden="true"></div>
+
+  <!-- Mobile Drawer -->
+  <div class="mobile-drawer" id="mobileDrawer" role="dialog" aria-label="Mobile menu">
+    <button class="close-btn" id="closeDrawer" aria-label="Close menu">&times;</button>
+    <a href="#home" class="drawer-link">Home</a>
+    <a href="#about" class="drawer-link">About</a>
+    <a href="#programs" class="drawer-link">Training</a>
+    <a href="#video-section" class="drawer-link">Events</a>
+    <a href="#contact" class="drawer-link">Contact</a>
+  </div>
+
+  <main id="main-content">
+
+    <!-- ==================== HERO SECTION ==================== -->
+    <section class="hero animate-section" id="home">
+      <div class="hero-logo-wrap animate-child">
+        <img src="HKTR_LOGO.png" alt="Hong Kong Tag Rugby" class="hero-logo-img">
+      </div>
+      <h1 class="hero-headline animate-child">Hong Kong's Home of Tag Rugby</h1>
+
+      <div style="position:relative; max-width:900px; margin:0 auto;">
+        <div class="hero-video-wrap animate-child">
+          <iframe
+            id="hero-video"
+            src="https://www.youtube.com/embed/IaeSa8u-wvQ?autoplay=1&mute=1&loop=1&playlist=IaeSa8u-wvQ&controls=0&modestbranding=1"
+            title="Hong Kong Tag Rugby"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen>
+          </iframe>
+        </div>
+        <button id="mute-toggle" class="mute-btn" aria-label="Unmute video" title="Unmute video">
+          <svg id="icon-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <line x1="23" y1="9" x2="17" y2="15"/>
+            <line x1="17" y1="9" x2="23" y2="15"/>
+          </svg>
+          <svg id="icon-unmuted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+          <span id="mute-label">Click for sound</span>
+        </button>
+      </div>
+
+      <p class="hero-subheadline animate-child">Building Asia's Tag Rugby Powerhouse — One Play at a Time</p>
+
+      <div class="hero-cta-wrap animate-child">
+        <a href="mailto:info@tagrugbyhk.org" class="btn-primary">Join the Squad</a>
+        <a href="#video-section" class="btn-secondary">Watch Highlights</a>
+      </div>
+    </section>
+
+    <!-- ==================== ABOUT SECTION ==================== -->
+    <section class="about animate-section" id="about">
+      <!-- Bauhinia Watermark -->
+      <div class="bauhinia about-watermark" aria-hidden="true">
+        <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M100 20c-8 18-22 30-40 36 6 14 6 30 0 44 18 6 32 18 40 36 8-18 22-30 40-36-6-14-6-30 0-44-18-6-32-18-40-36z" fill="#E91E63" opacity="0.5"/>
+          <path d="M100 50c-5 11-14 19-26 22 4 9 4 19 0 28 12 3 21 11 26 22 5-11 14-19 26-22-4-9-4-19 0-28-12-3-21-11-26-22z" fill="#E91E63" opacity="0.3"/>
+        </svg>
+      </div>
+
+      <div class="container" style="position:relative; z-index:1;">
+        <p class="section-label animate-child">ABOUT HKTR</p>
+        <h2 class="section-heading animate-child">More Than a Game</h2>
+
+        <div class="about-grid">
+          <p class="animate-child">Hong Kong Tag Rugby is a community-driven sports organisation built on a simple belief: that tag rugby has the power to transform lives. Founded by Azwar Nusantara, HKTR promotes physical and mental well-being through inclusive, competitive sport — creating opportunities for players of all backgrounds, ages, and abilities.</p>
+          <p class="animate-child">We are proudly affiliated with the International Tag Federation (ITF) and benchmark our standards against Oztag Australia, ensuring world-class governance and player experience. From grassroots social sessions to elite competitive divisions, we are building a transparent, ethical, and sustainable sports community — and positioning Hong Kong as Asia's undisputed tag rugby powerhouse.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== PROGRAMS SECTION ==================== -->
+    <section class="programs animate-section" id="programs">
+      <div class="programs-header container">
+        <p class="section-label animate-child">OUR PROGRAMS</p>
+        <h2 class="section-heading animate-child">Something for Everyone</h2>
+      </div>
+
+      <div class="programs-grid">
+        <!-- Card 1: Men's Open -->
+        <div class="program-card animate-child">
+          <div class="card-img-wrap"><img src="Men_action_shot_2.jpg" alt="Men's Open action shot" loading="lazy"></div>
+          <h3>Men's Open</h3>
+          <p>Competitive open-age division for male players. Fast-paced, strategic, elite-level tag rugby.</p>
+        </div>
+
+        <!-- Card 2: Men's 30s -->
+        <div class="program-card animate-child">
+          <div class="card-img-wrap"><img src="mens-senior-card.jpg" alt="Men's 30s action shot" loading="lazy"></div>
+          <h3>Men's 30s</h3>
+          <p>Over-30 division keeping veterans in the game. Experience meets endurance.</p>
+        </div>
+
+        <!-- Card 3: Men's Senior -->
+        <div class="program-card animate-child">
+          <div class="card-img-wrap"><img src="mens-senior-card.jpg" alt="Men's Senior action shot" loading="lazy"></div>
+          <h3>Men's Senior</h3>
+          <p>Senior competitive division for seasoned players who still have it.</p>
+        </div>
+
+        <!-- Card 4: Women's Open -->
+        <div class="program-card animate-child">
+          <div class="card-img-wrap"><img src="Women_action_shot_1.jpg" alt="Women's Open action shot" loading="lazy"></div>
+          <h3>Women's Open</h3>
+          <p>Premier women's division driving the growth of female tag rugby in Hong Kong.</p>
+        </div>
+
+        <!-- Card 5: Mixed Seniors -->
+        <div class="program-card animate-child">
+          <div class="card-img-wrap"><img src="Mixed_action_shot_2.jpg" alt="Mixed Seniors action shot" loading="lazy"></div>
+          <h3>Mixed Seniors</h3>
+          <p>Co-ed senior division combining experience, tactics, and social connection.</p>
+        </div>
+
+        <!-- Card 6: Mixed Opens -->
+        <div class="program-card animate-child">
+          <div class="card-img-wrap"><img src="Mixed_action_shot_3.jpg" alt="Mixed Opens action shot" loading="lazy"></div>
+          <h3>Mixed Opens</h3>
+          <p>Nurturing the next generation of Hong Kong tag rugby talent from the ground up.</p>
+        </div>
+      </div>
+    </section>
+
+        <!-- ==================== FEATURED HIGHLIGHTS CAROUSEL ==================== -->
+    <section class="highlights-carousel-section animate-section" id="video-section">
+      <p class="section-label animate-child">FEATURED HIGHLIGHTS</p>
+      <h2 class="animate-child" style="text-align:center; color:var(--white); margin-bottom: 40px;">Swipe Through the Action</h2>
+
+      <div class="video-carousel" id="videoCarousel">
+        <!-- Slide 1 -->
+        <div class="video-slide active" data-index="0">
+          <div class="video-slide-wrap">
+            <iframe
+              src="https://www.youtube.com/embed/IaeSa8u-wvQ?autoplay=1&mute=1&loop=1&playlist=IaeSa8u-wvQ&controls=0&modestbranding=1"
+              title="Hong Kong Tag Rugby"
+              allow="autoplay; encrypted-media; picture-in-picture"
+              allowfullscreen>
+            </iframe>
+            <button class="mute-btn carousel-mute" data-target="0" aria-label="Unmute video">
+              <svg class="icon-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+              <svg class="icon-unmuted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              <span class="mute-txt">Click for sound</span>
+            </button>
+          </div>
+          <p class="video-slide-caption">Game Day Energy</p>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="video-slide" data-index="1">
+          <div class="video-slide-wrap">
+            <iframe
+              src="https://www.youtube.com/embed/Y9vEconZVWc?autoplay=1&mute=1&loop=1&playlist=Y9vEconZVWc&rel=0&modestbranding=1&controls=0"
+              title="HKTR Game Highlights"
+              allow="autoplay; encrypted-media; picture-in-picture"
+              allowfullscreen>
+            </iframe>
+            <button class="mute-btn carousel-mute" data-target="1" aria-label="Unmute video">
+              <svg class="icon-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+              <svg class="icon-unmuted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              <span class="mute-txt">Click for sound</span>
+            </button>
+          </div>
+          <p class="video-slide-caption">See the Energy</p>
+        </div>
+
+        <!-- Slide 3 -->
+        <div class="video-slide" data-index="2">
+          <div class="video-slide-wrap">
+            <iframe
+              src="https://www.youtube.com/embed/o0EjyCn2aZs?autoplay=1&mute=1&loop=1&playlist=o0EjyCn2aZs&rel=0&modestbranding=1&controls=0"
+              title="HKTR More Highlights"
+              allow="autoplay; encrypted-media; picture-in-picture"
+              allowfullscreen>
+            </iframe>
+            <button class="mute-btn carousel-mute" data-target="2" aria-label="Unmute video">
+              <svg class="icon-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+              <svg class="icon-unmuted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              <span class="mute-txt">Click for sound</span>
+            </button>
+          </div>
+          <p class="video-slide-caption">Game On</p>
+        </div>
+      </div>
+
+      <!-- Carousel Controls -->
+      <div class="carousel-dots">
+        <button class="carousel-dot active" data-index="0" aria-label="Video 1"></button>
+        <button class="carousel-dot" data-index="1" aria-label="Video 2"></button>
+        <button class="carousel-dot" data-index="2" aria-label="Video 3"></button>
+      </div>
+
+      <div class="carousel-arrows">
+        <button class="carousel-arrow carousel-prev" aria-label="Previous video">&#10094;</button>
+        <button class="carousel-arrow carousel-next" aria-label="Next video">&#10095;</button>
+      </div>
+    </section>
+<!-- ==================== ASIA CUP TEASER + GALLERY ==================== -->
+    <section class="asiacup animate-section">
+      <div class="asiacup-bg-year" aria-hidden="true">2026</div>
+
+      <!-- Decorative Bauhinia Flowers -->
+      <div class="bauhinia" style="top:15%; left:8%; width:40px; height:40px; opacity:0.06;" aria-hidden="true">
+        <svg viewBox="0 0 200 200" fill="none"><path d="M100 20c-8 18-22 30-40 36 6 14 6 30 0 44 18 6 32 18 40 36 8-18 22-30 40-36-6-14-6-30 0-44-18-6-32-18-40-36z" fill="#E91E63"/></svg>
+      </div>
+      <div class="bauhinia" style="bottom:20%; right:10%; width:50px; height:50px; opacity:0.05;" aria-hidden="true">
+        <svg viewBox="0 0 200 200" fill="none"><path d="M100 20c-8 18-22 30-40 36 6 14 6 30 0 44 18 6 32 18 40 36 8-18 22-30 40-36-6-14-6-30 0-44-18-6-32-18-40-36z" fill="#E91E63"/></svg>
+      </div>
+      <div class="bauhinia" style="top:40%; right:5%; width:30px; height:30px; opacity:0.04;" aria-hidden="true">
+        <svg viewBox="0 0 200 200" fill="none"><path d="M100 20c-8 18-22 30-40 36 6 14 6 30 0 44 18 6 32 18 40 36 8-18 22-30 40-36-6-14-6-30 0-44-18-6-32-18-40-36z" fill="#E91E63"/></svg>
+      </div>
+
+      <div class="asiacup-inner">
+        <p class="section-label animate-child">PAST EVENT</p>
+        <h2 class="animate-child">Tag Asia Cup 2026</h2>
+        <p class="asiacup-badge animate-child">Asia's First International Tag Federation Sanctioned Tournament</p>
+        <div class="asiacup-photo animate-child">
+          <img src="ASIA_CUP_TEAM_PHOTO_1.jpg" alt="Tag Asia Cup 2026 Team Photo" loading="lazy">
+        </div>
+        <p class="asiacup-sub animate-child">Hong Kong's biggest tag rugby tournament is on the horizon.</p>
+        <p class="animate-child">Teams from across Asia will converge on Hong Kong for an unforgettable showcase of skill, sportsmanship, and regional pride. Stay tuned for fixtures, registration details, and sponsorship opportunities.</p>
+
+        <!-- Division Photo Galleries -->
+        <div class="gallery-wrap animate-child">
+          <p class="gallery-heading">Division Photo Galleries</p>
+          <div class="gallery-grid">
+            <button class="gallery-card" data-gallery="mens-open" aria-label="Open Men's Open gallery">
+              <div class="gallery-thumb"><img src="Men_action_shot_2.jpg" alt="Men's Open" loading="lazy"></div>
+              <span class="gallery-title">Men's Open</span>
+              <span class="gallery-arrow">View Gallery →</span>
+            </button>
+            <button class="gallery-card" data-gallery="mixed-open" aria-label="Open Mixed Open gallery">
+              <div class="gallery-thumb"><img src="Mixed_action_shot_1.jpg" alt="Mixed Open" loading="lazy"></div>
+              <span class="gallery-title">Mixed Open</span>
+              <span class="gallery-arrow">View Gallery →</span>
+            </button>
+            <button class="gallery-card" data-gallery="mens-senior" aria-label="Open Men's Senior gallery">
+              <div class="gallery-thumb"><img src="mens-senior-card.jpg" alt="Men's Senior" loading="lazy"></div>
+              <span class="gallery-title">Men's Senior</span>
+              <span class="gallery-arrow">View Gallery →</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+<!-- ==================== VIDEO HIGHLIGHTS 3 ==================== -->
+    <section class="video-section animate-section" id="video-highlights-3">
+      <p class="section-label animate-child">MORE HIGHLIGHTS</p>
+      <h2 class="animate-child">Game On</h2>
+      <div class="video-fullscreen-wrap animate-child">
+        <iframe
+          id="highlights-video-3"
+          src="https://www.youtube.com/embed/o0EjyCn2aZs?autoplay=1&mute=1&loop=1&playlist=o0EjyCn2aZs&rel=0&modestbranding=1&controls=0"
+          title="HKTR More Highlights"
+          allow="autoplay; encrypted-media; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+        <button id="mute-toggle-3" class="mute-btn" aria-label="Unmute video" title="Unmute video">
+          <svg id="icon-muted-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <line x1="23" y1="9" x2="17" y2="15"/>
+            <line x1="17" y1="9" x2="23" y2="15"/>
+          </svg>
+          <svg id="icon-unmuted-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+          <span id="mute-label-3">Click for sound</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== CONTACT SECTION ==================== -->
+    <section class="contact animate-section" id="contact">
+      <h2 class="animate-child">Ready to Play?</h2>
+      <p class="contact-sub animate-child">Whether you're a player, sponsor, or supporter — we'd love to hear from you.</p>
+
+      <div class="contact-grid">
+        <a href="mailto:info@tagrugbyhk.org" class="contact-item animate-child">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="2" y="4" width="20" height="16" rx="2"/>
+            <path d="M22 7l-10 7L2 7"/>
+          </svg>
+          info@tagrugbyhk.org
+        </a>
+        <a href="https://wa.me/85257951682" target="_blank" rel="noopener noreferrer" class="contact-item animate-child">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+          </svg>
+          +852 5795 1682
+        </a>
+        <a href="https://www.instagram.com/hk_tag_rugby?igsh=ZmtoMjl6cGl0cGg0" target="_blank" rel="noopener noreferrer" class="contact-item animate-child">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+          </svg>
+          @hk_tag_rugby
+        </a>
+        <a href="https://youtube.com/@taghkrugby?si=uDi2qkfgzg2jolNL" target="_blank" rel="noopener noreferrer" class="contact-item animate-child">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 11.75a29 29 0 00.46 5.33A2.78 2.78 0 003.4 19.13c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-2 29 29 0 00.46-5.25 29 29 0 00-.46-5.46z"/>
+            <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/>
+          </svg>
+          @TAGhkRUGBY
+        </a>
+      </div>
+
+      <a href="mailto:info@tagrugbyhk.org" class="btn-primary animate-child">Get in Touch</a>
+    </section>
+
+  </main>
+
+
+
+  <!-- ==================== JAVASCRIPT ==================== -->
+  <script>
+    (function() {
+      'use strict';
+
+      // ==========================================
+      // NAVBAR SCROLL SHADOW
+      // ==========================================
+      var navbar = document.getElementById('navbar');
+      function onScroll() {
+        if (window.scrollY > 50) {
+          navbar.classList.add('scrolled');
+        } else {
+          navbar.classList.remove('scrolled');
+        }
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      // ==========================================
+      // MOBILE DRAWER
+      // ==========================================
+      var hamburger = document.getElementById('hamburger');
+      var mobileDrawer = document.getElementById('mobileDrawer');
+      var drawerOverlay = document.getElementById('drawerOverlay');
+      var closeDrawer = document.getElementById('closeDrawer');
+      var drawerLinks = document.querySelectorAll('.drawer-link');
+
+      function openDrawer() {
+        mobileDrawer.classList.add('open');
+        drawerOverlay.classList.add('open');
+        hamburger.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeDrawerFn() {
+        mobileDrawer.classList.remove('open');
+        drawerOverlay.classList.remove('open');
+        hamburger.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      }
+
+      hamburger.addEventListener('click', openDrawer);
+      closeDrawer.addEventListener('click', closeDrawerFn);
+      drawerOverlay.addEventListener('click', closeDrawerFn);
+
+      drawerLinks.forEach(function(link) {
+        link.addEventListener('click', closeDrawerFn);
+      });
+
+      // Close drawer on Escape key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && mobileDrawer.classList.contains('open')) {
+          closeDrawerFn();
+        }
+      });
+
+      // ==========================================
+      // SCROLL-TRIGGERED ANIMATIONS (IntersectionObserver)
+      // ==========================================
+      var animatedSections = document.querySelectorAll('.animate-section');
+
+      if ('IntersectionObserver' in window) {
+        var observer = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('animate-in');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, {
+          threshold: 0.1,
+          rootMargin: '0px 0px -40px 0px'
+        });
+
+        animatedSections.forEach(function(section) {
+          observer.observe(section);
+        });
+      } else {
+        // Fallback for browsers without IntersectionObserver
+        animatedSections.forEach(function(section) {
+          section.classList.add('animate-in');
+        });
+      }
+
+      // ==========================================
+      // SMOOTH SCROLL POLYFILL FOR SAFARI
+      // ==========================================
+      document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+        anchor.addEventListener('click', function(e) {
+          var targetId = this.getAttribute('href');
+          if (targetId === '#') return;
+          var target = document.querySelector(targetId);
+          if (target) {
+            e.preventDefault();
+            var navHeight = navbar.offsetHeight;
+            var targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navHeight;
+            window.scrollTo({
+              top: targetPosition,
+              behavior: 'smooth'
+            });
+          }
+        });
+      });
+
+    })();
+  </script>
+
+  <script>
+    /* ================== HTML5 VIDEO MUTE TOGGLE ================== */
+    var isMuted = true;
+
+    // UI update helper
+    function updateMuteUI(muted) {
+      var iconMuted = document.getElementById('icon-muted');
+      var iconUnmuted = document.getElementById('icon-unmuted');
+      var muteLabel = document.getElementById('mute-label');
+      var muteToggleBtn = document.getElementById('mute-toggle');
+      if (muted) {
+        if (iconMuted) iconMuted.style.display = 'block';
+        if (iconUnmuted) iconUnmuted.style.display = 'none';
+        if (muteLabel) muteLabel.textContent = 'Click for sound';
+        if (muteToggleBtn) {
+          muteToggleBtn.setAttribute('aria-label', 'Unmute video');
+          muteToggleBtn.setAttribute('title', 'Unmute video');
+        }
+      } else {
+        if (iconMuted) iconMuted.style.display = 'none';
+        if (iconUnmuted) iconUnmuted.style.display = 'block';
+        if (muteLabel) muteLabel.textContent = 'Mute';
+        if (muteToggleBtn) {
+          muteToggleBtn.setAttribute('aria-label', 'Mute video');
+          muteToggleBtn.setAttribute('title', 'Mute video');
+        }
+      }
+    }
+
+    // Mute toggle button handler — Hero Video
+    (function() {
+      var muteToggleBtn = document.getElementById('mute-toggle');
+      if (muteToggleBtn) {
+        muteToggleBtn.addEventListener('click', function() {
+          var iframe = document.getElementById('hero-video');
+          if (iframe) {
+            if (isMuted) {
+              iframe.src = 'https://www.youtube.com/embed/IaeSa8u-wvQ?autoplay=1&mute=0&loop=1&playlist=IaeSa8u-wvQ&controls=0&modestbranding=1';
+              isMuted = false;
+            } else {
+              iframe.src = 'https://www.youtube.com/embed/IaeSa8u-wvQ?autoplay=1&mute=1&loop=1&playlist=IaeSa8u-wvQ&controls=0&modestbranding=1';
+              isMuted = true;
+            }
+            updateMuteUI(isMuted);
+          }
+        });
+      }
+    })();
+
+    // Mute toggle button handler — Highlights Video (Video 2)
+    (function() {
+      var muteToggle2 = document.getElementById('mute-toggle-2');
+      var iconMuted2 = document.getElementById('icon-muted-2');
+      var iconUnmuted2 = document.getElementById('icon-unmuted-2');
+      var muteLabel2 = document.getElementById('mute-label-2');
+      var isMuted2 = true;
+
+      function updateMuteUI2(muted) {
+        if (muted) {
+          if (iconMuted2) iconMuted2.style.display = 'block';
+          if (iconUnmuted2) iconUnmuted2.style.display = 'none';
+          if (muteLabel2) muteLabel2.textContent = 'Click for sound';
+          if (muteToggle2) {
+            muteToggle2.setAttribute('aria-label', 'Unmute video');
+            muteToggle2.setAttribute('title', 'Unmute video');
+          }
+        } else {
+          if (iconMuted2) iconMuted2.style.display = 'none';
+          if (iconUnmuted2) iconUnmuted2.style.display = 'block';
+          if (muteLabel2) muteLabel2.textContent = 'Mute';
+          if (muteToggle2) {
+            muteToggle2.setAttribute('aria-label', 'Mute video');
+            muteToggle2.setAttribute('title', 'Mute video');
+          }
+        }
+      }
+
+      if (muteToggle2) {
+        muteToggle2.addEventListener('click', function() {
+          var iframe2 = document.getElementById('highlights-video');
+          if (iframe2) {
+            if (isMuted2) {
+              iframe2.src = 'https://www.youtube.com/embed/Y9vEconZVWc?autoplay=1&mute=0&loop=1&playlist=Y9vEconZVWc&rel=0&modestbranding=1&controls=0';
+              isMuted2 = false;
+            } else {
+              iframe2.src = 'https://www.youtube.com/embed/Y9vEconZVWc?autoplay=1&mute=1&loop=1&playlist=Y9vEconZVWc&rel=0&modestbranding=1&controls=0';
+              isMuted2 = true;
+            }
+            updateMuteUI2(isMuted2);
+          }
+        });
+      }
+    })();
+
+    // Mute toggle button handler — Video 3 (Highlights)
+    (function() {
+      var muteToggle3 = document.getElementById('mute-toggle-3');
+      var iconMuted3 = document.getElementById('icon-muted-3');
+      var iconUnmuted3 = document.getElementById('icon-unmuted-3');
+      var muteLabel3 = document.getElementById('mute-label-3');
+      var isMuted3 = true;
+
+      function updateMuteUI3(muted) {
+        if (muted) {
+          if (iconMuted3) iconMuted3.style.display = 'block';
+          if (iconUnmuted3) iconUnmuted3.style.display = 'none';
+          if (muteLabel3) muteLabel3.textContent = 'Click for sound';
+          if (muteToggle3) {
+            muteToggle3.setAttribute('aria-label', 'Unmute video');
+            muteToggle3.setAttribute('title', 'Unmute video');
+          }
+        } else {
+          if (iconMuted3) iconMuted3.style.display = 'none';
+          if (iconUnmuted3) iconUnmuted3.style.display = 'block';
+          if (muteLabel3) muteLabel3.textContent = 'Mute';
+          if (muteToggle3) {
+            muteToggle3.setAttribute('aria-label', 'Mute video');
+            muteToggle3.setAttribute('title', 'Mute video');
+          }
+        }
+      }
+
+      if (muteToggle3) {
+        muteToggle3.addEventListener('click', function() {
+          var iframe3 = document.getElementById('highlights-video-3');
+          if (iframe3) {
+            if (isMuted3) {
+              iframe3.src = 'https://www.youtube.com/embed/o0EjyCn2aZs?autoplay=1&mute=0&loop=1&playlist=o0EjyCn2aZs&rel=0&modestbranding=1&controls=0';
+              isMuted3 = false;
+            } else {
+              iframe3.src = 'https://www.youtube.com/embed/o0EjyCn2aZs?autoplay=1&mute=1&loop=1&playlist=o0EjyCn2aZs&rel=0&modestbranding=1&controls=0';
+              isMuted3 = true;
+            }
+            updateMuteUI3(isMuted3);
+          }
+        });
+      }
+    })();
+
+    /* ================== VIDEO CAROUSEL ================== */
+    (function() {
+      var carousel = document.getElementById('videoCarousel');
+      if (!carousel) return;
+
+      var slides = carousel.querySelectorAll('.video-slide');
+      var dots = document.querySelectorAll('.carousel-dot');
+      var prevBtn = document.querySelector('.carousel-prev');
+      var nextBtn = document.querySelector('.carousel-next');
+      var currentIndex = 0;
+      var slideWidth = 0;
+
+      function updateSlideWidth() {
+        slideWidth = slides[0] ? slides[0].offsetWidth + 24 : 0; // + gap
+      }
+
+      function goToSlide(index) {
+        if (index < 0) index = slides.length - 1;
+        if (index >= slides.length) index = 0;
+        currentIndex = index;
+        updateSlideWidth();
+        carousel.scrollTo({ left: slideWidth * index, behavior: 'smooth' });
+        updateActive();
+      }
+
+      function updateActive() {
+        slides.forEach(function(s, i) {
+          s.classList.toggle('active', i === currentIndex);
+        });
+        dots.forEach(function(d, i) {
+          d.classList.toggle('active', i === currentIndex);
+        });
+      }
+
+      // Scroll snap detection
+      carousel.addEventListener('scroll', function() {
+        updateSlideWidth();
+        var newIndex = Math.round(carousel.scrollLeft / slideWidth);
+        if (newIndex !== currentIndex && newIndex >= 0 && newIndex < slides.length) {
+          currentIndex = newIndex;
+          updateActive();
+        }
+      }, { passive: true });
+
+      // Dots
+      dots.forEach(function(dot) {
+        dot.addEventListener('click', function() {
+          goToSlide(parseInt(this.getAttribute('data-index')));
+        });
+      });
+
+      // Arrows
+      if (prevBtn) prevBtn.addEventListener('click', function() { goToSlide(currentIndex - 1); });
+      if (nextBtn) nextBtn.addEventListener('click', function() { goToSlide(currentIndex + 1); });
+
+      // Touch swipe support
+      var touchStartX = 0;
+      carousel.addEventListener('touchstart', function(e) {
+        touchStartX = e.touches[0].clientX;
+      }, { passive: true });
+
+      carousel.addEventListener('touchend', function(e) {
+        var diff = touchStartX - e.changedTouches[0].clientX;
+        if (Math.abs(diff) > 50) {
+          goToSlide(currentIndex + (diff > 0 ? 1 : -1));
+        }
+      }, { passive: true });
+
+      // Initial
+      updateSlideWidth();
+      updateActive();
+
+      // Recalculate on resize
+      window.addEventListener('resize', updateSlideWidth);
+
+      // Carousel mute buttons
+      var mutedStates = [true, true, true];
+      carousel.querySelectorAll('.carousel-mute').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var target = parseInt(this.getAttribute('data-target'));
+          var iframe = slides[target].querySelector('iframe');
+          var iconMuted = this.querySelector('.icon-muted');
+          var iconUnmuted = this.querySelector('.icon-unmuted');
+          var txt = this.querySelector('.mute-txt');
+
+          if (!iframe) return;
+
+          if (mutedStates[target]) {
+            // Unmute
+            var src = iframe.src;
+            iframe.src = src.replace('mute=1', 'mute=0');
+            mutedStates[target] = false;
+            if (iconMuted) iconMuted.style.display = 'none';
+            if (iconUnmuted) iconUnmuted.style.display = 'block';
+            if (txt) txt.textContent = 'Mute';
+            btn.setAttribute('aria-label', 'Mute video');
+          } else {
+            // Mute
+            var src = iframe.src;
+            iframe.src = src.replace('mute=0', 'mute=1');
+            mutedStates[target] = true;
+            if (iconMuted) iconMuted.style.display = 'block';
+            if (iconUnmuted) iconUnmuted.style.display = 'none';
+            if (txt) txt.textContent = 'Click for sound';
+            btn.setAttribute('aria-label', 'Unmute video');
+          }
+        });
+      });
+    })();
+
+  </script>
+
+  <!-- ==================== LIGHTBOX SLIDESHOW ==================== -->
+  <div id="lightbox" class="lightbox" aria-hidden="true">
+    <button class="lightbox-close" aria-label="Close gallery">&times;</button>
+    <button class="lightbox-prev" aria-label="Previous image">&#10094;</button>
+    <button class="lightbox-next" aria-label="Next image">&#10095;</button>
+
+    <div class="lightbox-stage">
+      <img id="lightbox-img" src="" alt="">
+      <div class="lightbox-counter" id="lightbox-counter">1 / 3</div>
+    </div>
+
+    <div class="lightbox-thumbs" id="lightbox-thumbs"></div>
+  </div>
+
+  <script>
+    /* ================== GALLERY LIGHTBOX ================== */
+    (function() {
+      var galleries = {
+        "mens-open": {
+          title: "Men's Open",
+          images: [
+            { src: "Z8A_2151 (2026-04-17T08_28_49.416).jpg", alt: "Men's Open action" },
+            { src: "Z8A_2164.jpg", alt: "Men's Open action" },
+            { src: "Z8A_2167 (2026-04-17T08_28_52.240).jpg", alt: "Men's Open action" },
+            { src: "Z8A_2172.jpg", alt: "Men's Open action" },
+            { src: "Z8A_2176.jpg", alt: "Men's Open action" },
+            { src: "Z8A_2187 (2026-04-17T08_28_57.283).jpg", alt: "Men's Open action" },
+            { src: "Z8A_2196.jpg", alt: "Men's Open action" },
+            { src: "Z8A_2207 (2026-04-17T08_29_00.086).jpg", alt: "Men's Open action" },
+            { src: "Z8A_2208.jpg", alt: "Men's Open action" },
+            { src: "Z8A_2213.jpg", alt: "Men's Open action" },
+            { src: "Z8A_2386.jpg", alt: "Men's Open action" },
+            { src: "Z8A_2388.jpg", alt: "Men's Open action" },
+            { src: "Z8A_2397.jpg", alt: "Men's Open action" },
+            { src: "Z8A_2405.jpg", alt: "Men's Open action" },
+            { src: "Z8A_2406.jpg", alt: "Men's Open action" },
+            { src: "Z8A_2411.jpg", alt: "Men's Open action" },
+            { src: "Z9A_7334.jpg", alt: "Men's Open action" },
+            { src: "Z9A_7339.jpg", alt: "Men's Open action" },
+            { src: "Z9A_7350.jpg", alt: "Men's Open action" },
+            { src: "Z9A_7352 (2026-04-17T08_29_07.855).jpg", alt: "Men's Open action" },
+            { src: "Z9A_7358.jpg", alt: "Men's Open action" },
+            { src: "Z9A_7359.jpg", alt: "Men's Open action" },
+            { src: "Z9A_7365 (2026-04-17T08_29_11.285).jpg", alt: "Men's Open action" },
+            { src: "Z9A_7370.jpg", alt: "Men's Open action" },
+            { src: "Z9A_7377.jpg", alt: "Men's Open action" },
+            { src: "Z9A_7380 (2026-04-17T08_29_18.504).jpg", alt: "Men's Open action" },
+            { src: "Z9A_7385.jpg", alt: "Men's Open action" },
+            { src: "Z9A_7393 (2026-04-17T08_29_23.905).jpg", alt: "Men's Open action" },
+            { src: "Z9A_7395 (2026-04-17T08_29_25.560).jpg", alt: "Men's Open action" },
+            { src: "Z9A_7397.jpg", alt: "Men's Open action" },
+            { src: "Z9A_7399.jpg", alt: "Men's Open action" },
+            { src: "Z9A_7403.jpg", alt: "Men's Open action" },
+            { src: "Z9A_7405.jpg", alt: "Men's Open action" },
+            { src: "Z9A_7412.jpg", alt: "Men's Open action" },
+            { src: "Z9A_7413 (2026-04-17T08_29_35.579).jpg", alt: "Men's Open action" },
+            { src: "Z9A_7415.jpg", alt: "Men's Open action" },
+            { src: "Z9A_7425 (2026-04-17T08_29_37.842).jpg", alt: "Men's Open action" },
+            { src: "Z9A_7433.jpg", alt: "Men's Open action" },
+            { src: "Z9A_7434.jpg", alt: "Men's Open action" },
+            { src: "Z9A_7436.jpg", alt: "Men's Open action" },
+            { src: "Z9A_7441 (2026-04-17T08_29_51.307).jpg", alt: "Men's Open action" },
+            { src: "Z9A_7941.jpg", alt: "Men's Open action" },
+            { src: "Z9A_7948 (2026-04-17T08_33_35.611).jpg", alt: "Men's Open action" },
+            { src: "Z9A_7950.jpg", alt: "Men's Open action" },
+            { src: "Z9A_7954 (2026-04-17T08_33_40.228).jpg", alt: "Men's Open action" },
+            { src: "Z9A_7957.jpg", alt: "Men's Open action" },
+            { src: "Z9A_7965.jpg", alt: "Men's Open action" },
+            { src: "Z9A_7967.jpg", alt: "Men's Open action" },
+            { src: "Z9A_7970 (2026-04-17T08_33_46.063).jpg", alt: "Men's Open action" },
+            { src: "Z9A_7975 (2026-04-17T08_33_47.230).jpg", alt: "Men's Open action" }
+          ]
+        },
+        "mixed-open": {
+          title: "Mixed Open",
+          images: [
+            { src: "Mixed_action_shot_1.jpg", alt: "Mixed Open action" },
+            { src: "Mixed_action_shot_2.jpg", alt: "Mixed Open action 2" },
+            { src: "Mixed_action_shot_3.jpg", alt: "Mixed Open action 3" }
+          ]
+        },
+        "mens-senior": {
+          title: "Men's Senior",
+          images: [
+            { src: "seniors_mens_4.jpg", alt: "Men's Senior action" }
+          ]
+        }
+      };
+
+      var lightbox = document.getElementById('lightbox');
+      var lightboxImg = document.getElementById('lightbox-img');
+      var lightboxCounter = document.getElementById('lightbox-counter');
+      var lightboxThumbs = document.getElementById('lightbox-thumbs');
+      var currentGallery = null;
+      var currentIndex = 0;
+
+      function openLightbox(galleryKey) {
+        currentGallery = galleries[galleryKey];
+        currentIndex = 0;
+        if (!currentGallery) return;
+
+        // Build thumbnails
+        lightboxThumbs.innerHTML = '';
+        currentGallery.images.forEach(function(img, idx) {
+          var thumb = document.createElement('button');
+          thumb.className = 'lightbox-thumb' + (idx === 0 ? ' active' : '');
+          thumb.innerHTML = '<img src="' + img.src + '" alt="' + img.alt + '">';
+          thumb.setAttribute('aria-label', 'Go to image ' + (idx + 1));
+          thumb.addEventListener('click', function() {
+            showImage(idx);
+          });
+          lightboxThumbs.appendChild(thumb);
+        });
+
+        showImage(0);
+        lightbox.setAttribute('aria-hidden', 'false');
+        lightbox.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeLightbox() {
+        lightbox.style.display = 'none';
+        lightbox.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        currentGallery = null;
+      }
+
+      function showImage(index) {
+        if (!currentGallery || !currentGallery.images[index]) return;
+        currentIndex = index;
+        lightboxImg.src = currentGallery.images[index].src;
+        lightboxImg.alt = currentGallery.images[index].alt;
+        lightboxCounter.textContent = (index + 1) + ' / ' + currentGallery.images.length;
+
+        // Update active thumb
+        var thumbs = lightboxThumbs.querySelectorAll('.lightbox-thumb');
+        thumbs.forEach(function(t, i) {
+          t.classList.toggle('active', i === index);
+        });
+      }
+
+      function nextImage() {
+        if (!currentGallery) return;
+        var next = (currentIndex + 1) % currentGallery.images.length;
+        showImage(next);
+      }
+
+      function prevImage() {
+        if (!currentGallery) return;
+        var prev = (currentIndex - 1 + currentGallery.images.length) % currentGallery.images.length;
+        showImage(prev);
+      }
+
+      // Card click handlers
+      document.querySelectorAll('.gallery-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+          var key = this.getAttribute('data-gallery');
+          if (key) openLightbox(key);
+        });
+      });
+
+      // Close button
+      document.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
+
+      // Prev/Next buttons
+      document.querySelector('.lightbox-prev').addEventListener('click', prevImage);
+      document.querySelector('.lightbox-next').addEventListener('click', nextImage);
+
+      // Click outside to close
+      lightbox.addEventListener('click', function(e) {
+        if (e.target === lightbox) closeLightbox();
+      });
+
+      // Keyboard navigation
+      document.addEventListener('keydown', function(e) {
+        if (lightbox.style.display !== 'flex') return;
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowRight') nextImage();
+        if (e.key === 'ArrowLeft') prevImage();
+      });
+    })();
+  </script>
+</body>
+</html>
