@@ -2132,77 +2132,75 @@
   <script>
     /* ================== GALLERY LIGHTBOX ================== */
     (function() {
-      var galleries = {
+      // Google Apps Script URL for Drive gallery sync
+      var DRIVE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxOIyjojRAKxgv78WE0bu8zmnoiTUVbE2JPoxZyYIcbHURr2RyIO-_nX8ilNgf9TiKr/exec';
+
+      // Static fallback galleries (used if Drive fetch fails)
+      var fallbackGalleries = {
         "mens-open": {
           title: "Men's Open",
           images: [
-            { src: "Z8A_2151 (2026-04-17T08_28_49.416).jpg", alt: "Men's Open action" },
-            { src: "Z8A_2164.jpg", alt: "Men's Open action" },
-            { src: "Z8A_2167 (2026-04-17T08_28_52.240).jpg", alt: "Men's Open action" },
-            { src: "Z8A_2172.jpg", alt: "Men's Open action" },
-            { src: "Z8A_2176.jpg", alt: "Men's Open action" },
-            { src: "Z8A_2187 (2026-04-17T08_28_57.283).jpg", alt: "Men's Open action" },
-            { src: "Z8A_2196.jpg", alt: "Men's Open action" },
-            { src: "Z8A_2207 (2026-04-17T08_29_00.086).jpg", alt: "Men's Open action" },
-            { src: "Z8A_2208.jpg", alt: "Men's Open action" },
-            { src: "Z8A_2213.jpg", alt: "Men's Open action" },
-            { src: "Z8A_2386.jpg", alt: "Men's Open action" },
-            { src: "Z8A_2388.jpg", alt: "Men's Open action" },
-            { src: "Z8A_2397.jpg", alt: "Men's Open action" },
-            { src: "Z8A_2405.jpg", alt: "Men's Open action" },
-            { src: "Z8A_2406.jpg", alt: "Men's Open action" },
-            { src: "Z8A_2411.jpg", alt: "Men's Open action" },
-            { src: "Z9A_7334.jpg", alt: "Men's Open action" },
-            { src: "Z9A_7339.jpg", alt: "Men's Open action" },
-            { src: "Z9A_7350.jpg", alt: "Men's Open action" },
-            { src: "Z9A_7352 (2026-04-17T08_29_07.855).jpg", alt: "Men's Open action" },
-            { src: "Z9A_7358.jpg", alt: "Men's Open action" },
-            { src: "Z9A_7359.jpg", alt: "Men's Open action" },
-            { src: "Z9A_7365 (2026-04-17T08_29_11.285).jpg", alt: "Men's Open action" },
-            { src: "Z9A_7370.jpg", alt: "Men's Open action" },
-            { src: "Z9A_7377.jpg", alt: "Men's Open action" },
-            { src: "Z9A_7380 (2026-04-17T08_29_18.504).jpg", alt: "Men's Open action" },
-            { src: "Z9A_7385.jpg", alt: "Men's Open action" },
-            { src: "Z9A_7393 (2026-04-17T08_29_23.905).jpg", alt: "Men's Open action" },
-            { src: "Z9A_7395 (2026-04-17T08_29_25.560).jpg", alt: "Men's Open action" },
-            { src: "Z9A_7397.jpg", alt: "Men's Open action" },
-            { src: "Z9A_7399.jpg", alt: "Men's Open action" },
-            { src: "Z9A_7403.jpg", alt: "Men's Open action" },
-            { src: "Z9A_7405.jpg", alt: "Men's Open action" },
-            { src: "Z9A_7412.jpg", alt: "Men's Open action" },
-            { src: "Z9A_7413 (2026-04-17T08_29_35.579).jpg", alt: "Men's Open action" },
-            { src: "Z9A_7415.jpg", alt: "Men's Open action" },
-            { src: "Z9A_7425 (2026-04-17T08_29_37.842).jpg", alt: "Men's Open action" },
-            { src: "Z9A_7433.jpg", alt: "Men's Open action" },
-            { src: "Z9A_7434.jpg", alt: "Men's Open action" },
-            { src: "Z9A_7436.jpg", alt: "Men's Open action" },
-            { src: "Z9A_7441 (2026-04-17T08_29_51.307).jpg", alt: "Men's Open action" },
-            { src: "Z9A_7941.jpg", alt: "Men's Open action" },
-            { src: "Z9A_7948 (2026-04-17T08_33_35.611).jpg", alt: "Men's Open action" },
-            { src: "Z9A_7950.jpg", alt: "Men's Open action" },
-            { src: "Z9A_7954 (2026-04-17T08_33_40.228).jpg", alt: "Men's Open action" },
-            { src: "Z9A_7957.jpg", alt: "Men's Open action" },
-            { src: "Z9A_7965.jpg", alt: "Men's Open action" },
-            { src: "Z9A_7967.jpg", alt: "Men's Open action" },
-            { src: "Z9A_7970 (2026-04-17T08_33_46.063).jpg", alt: "Men's Open action" },
-            { src: "Z9A_7975 (2026-04-17T08_33_47.230).jpg", alt: "Men's Open action" }
+            { src: "Men_action_shot_2.jpg", alt: "Men's Open" },
+            { src: "Men_action_shot_3.jpg", alt: "Men's Open" },
+            { src: "ASIA_CUP_TEAM_PHOTO_1.jpg", alt: "Men's Open team" },
+            { src: "ASIA_CUP_TEAM_PHOTO_2.jpg", alt: "Men's Open team" }
           ]
         },
         "mixed-open": {
           title: "Mixed Open",
           images: [
-            { src: "Mixed_action_shot_1.jpg", alt: "Mixed Open action" },
-            { src: "Mixed_action_shot_2.jpg", alt: "Mixed Open action 2" },
-            { src: "Mixed_action_shot_3.jpg", alt: "Mixed Open action 3" }
+            { src: "Mixed_action_shot_1.jpg", alt: "Mixed Open" },
+            { src: "Mixed_action_shot_2.jpg", alt: "Mixed Open" },
+            { src: "Mixed_action_shot_3.jpg", alt: "Mixed Open" },
+            { src: "ASIA_CUP_TEAM_PHOTO_3.jpg", alt: "Mixed Open team" }
           ]
         },
         "mens-senior": {
           title: "Men's Senior",
           images: [
-            { src: "seniors_mens_4.jpg", alt: "Men's Senior action" }
+            { src: "mens-senior-card.jpg", alt: "Men's Senior" }
           ]
         }
       };
+
+      // Active galleries (populated from Google Drive or fallback)
+      var galleries = fallbackGalleries;
+
+      // Fetch galleries from Google Drive
+      function loadGalleriesFromDrive() {
+        if (!DRIVE_SCRIPT_URL) return;
+        fetch(DRIVE_SCRIPT_URL + '?gallery=all')
+          .then(function(res) { return res.json(); })
+          .then(function(data) {
+            if (data.error) { console.warn('[Gallery] Drive error:', data.error); return; }
+            for (var key in data) {
+              if (key.startsWith('_')) continue;
+              if (data[key] && data[key].images && data[key].images.length > 0) {
+                galleries[key] = data[key];
+                console.log('[Gallery] Loaded', data[key].images.length, 'photos for', key);
+              }
+            }
+            updateGalleryCounts();
+          })
+          .catch(function(err) {
+            console.warn('[Gallery] Failed to load from Drive:', err);
+          });
+      }
+
+      // Update photo counts on gallery cards
+      function updateGalleryCounts() {
+        document.querySelectorAll('.gallery-card').forEach(function(card) {
+          var key = card.getAttribute('data-gallery');
+          if (key && galleries[key]) {
+            var count = galleries[key].images.length;
+            var label = card.querySelector('.gallery-arrow');
+            if (label) label.textContent = count + ' Photos \u2192';
+          }
+        });
+      }
+
+      // Load from Drive on page load
+      loadGalleriesFromDrive();
 
       var lightbox = document.getElementById('lightbox');
       var lightboxImg = document.getElementById('lightbox-img');
